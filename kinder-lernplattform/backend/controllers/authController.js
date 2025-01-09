@@ -12,4 +12,12 @@ function generateToken(user) {
   );
 }
 
+// Beispiel-Route, die einen Token zurückgibt
+app.post('/login', (req, res) => {
+  const user = { id: 1, username: 'testuser' }; // Beispiel-Benutzer
+  const token = generateToken(user);
+
+  res.json({ token });
+});
+
 module.exports = { generateToken };
