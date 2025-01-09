@@ -13,10 +13,16 @@ const LoginPage = () => {
         email,
         password,
       });
-      setMessage(`Erfolgreich angemeldet: ${response.data.token}`);
+      const token = response.data.token;
+      localStorage.setItem('token', token); // Token in localStorage speichern
+      setMessage(`Erfolgreich angemeldet: ${token}`);
     } catch (error) {
-      setMessage('Fehler beim Login.');
-    }
+        if (error.response && error.response.status === 401) {
+          setMessage('Ungültige E-Mail oder Passwort.');
+        } else {
+          setMessage('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+        }
+      }
   };
 
   return (
