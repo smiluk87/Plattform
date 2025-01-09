@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
-
-// Secret aus Umgebungsvariablen laden
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET; //secret aus Umgebungsvariablen laden
 
 // Funktion zum Generieren eines JWT
 function generateToken(user) {
@@ -12,12 +10,5 @@ function generateToken(user) {
   );
 }
 
-// Beispiel-Route, die einen Token zurückgibt
-app.post('/login', (req, res) => {
-  const user = { id: 1, username: 'testuser' }; // Beispiel-Benutzer
-  const token = generateToken(user);
-
-  res.json({ token });
-});
-
 module.exports = { generateToken };
+

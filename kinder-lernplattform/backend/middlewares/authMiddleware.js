@@ -1,11 +1,8 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET; //Secret aus Umgebungsvariablen laden 
 
-// Secret aus Umgebungsvariablen laden
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Middleware zum Verifizieren eines JWT
 function verifyToken(req, res, next) {
-  const token = req.headers['authorization'];
+  const token = req.headers['authorization']?.split(' ')[1]; // Bearer-Token extrahieren
 
   if (!token) {
     return res.status(403).json({ message: 'Kein Token bereitgestellt!' });
@@ -16,7 +13,7 @@ function verifyToken(req, res, next) {
       return res.status(401).json({ message: 'Ungültiger Token!' });
     }
 
-    req.user = decoded; // Dekodierte Benutzerdaten speichern
+    req.user = decoded; // Benutzerdaten speichern
     next();
   });
 }
