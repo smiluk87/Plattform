@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import RegisterPage from './pages/RegisterPage';
 import TestPage from './pages/TestPage';
-import LoginPage from './pages/LoginPage'; // Füge diesen Import hinzu
+import LoginPage from './pages/LoginPage'; 
+import QuizPage from './pages/QuizPage'; // Importiere die QuizPage-Komponente
 
 const App = () => {
   return (
@@ -14,10 +15,11 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/test" element={<TestPage />} />
-        <Route path="/quiz" element={<QuizPage />} />
+        <Route path="/quiz" element={<QuizPage />} /> {/* Route für Quiz */}
       </Routes>
     </Router>
   );
 };
 
 export default App;
+
