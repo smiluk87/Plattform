@@ -2,7 +2,7 @@
 GET http://localhost:5000/users/progress
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
 
-//POST /progress (Fortschritt speichern)
+###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
@@ -12,6 +12,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
   "score": 8
 }
 
-//GET /profile (Benutzerprofil anzeigen)
+### GET /profile (Benutzerprofil anzeigen)
 GET http://localhost:5000/users/profile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
+
+### Test 1: Score = 3 (Bronzemedaille)
+POST http://localhost:5000/users/progress
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
+
+{
+  "category": "math",
+  "score": 3
+}
+
+### Test 2: Score = 5 (Silbermedaille)
+POST http://localhost:5000/users/progress
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
+
+{
+  "category": "math",
+  "score": 5
+}
+
+### Test 3: Score = 10 (Goldmedaille)
+POST http://localhost:5000/users/progress
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
+
+{
+  "category": "math",
+  "score": 10
+}

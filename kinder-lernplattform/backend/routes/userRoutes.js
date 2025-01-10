@@ -107,18 +107,24 @@ router.post('/progress', verifyToken, (req, res) => {
   };
 
   userProgress[userId].push(progressEntry);
-   // Meilenstein-Belohnungen
-   let reward = null;
-   if (score >= 10) {
-     reward = 'Goldmedaille';
-   } else if (score >= 5) {
-     reward = 'Silbermedaille';
-   } else if (score >= 3) {
-     reward = 'Bronzemedaille';
-   }
-   
-  res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress: progressEntry });
+
+  // Meilenstein-Belohnungen
+  let reward = null;
+  if (score >= 10) {
+    reward = 'Goldmedaille';
+  } else if (score >= 5) {
+    reward = 'Silbermedaille';
+  } else if (score >= 3) {
+    reward = 'Bronzemedaille';
+  }
+
+  res.status(201).json({
+    message: 'Fortschritt erfolgreich gespeichert!',
+    progress: progressEntry,
+    reward, // Belohnung wird mit der Antwort zurückgegeben
+  });
 });
+
 
 // Route zum Abrufen des Fortschritts
 router.get('/progress', verifyToken, (req, res) => {
