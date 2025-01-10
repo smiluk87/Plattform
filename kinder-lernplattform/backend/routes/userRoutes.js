@@ -33,6 +33,7 @@ const quizData = {
   math: [
     { question: "Was ist 2 + 2?", options: ["3", "4", "5"], answer: "4" },
     { question: "Was ist 10 - 5?", options: ["3", "4", "5"], answer: "5" },
+    { question: "Was ist 35 - 17?", options: ["19", "18", "22"], answer: "18" },
   ],
   english: [
     { question: "What is the opposite of 'hot'?", options: ["cold", "warm", "cool"], answer: "cold" },

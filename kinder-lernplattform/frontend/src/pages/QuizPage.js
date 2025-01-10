@@ -10,17 +10,21 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/users/quiz/math', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setQuestions(data);
+      try {
+        const res = await fetch('http://localhost:5000/users/quiz/math', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setQuestions(data);
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Quizfragen:", error);
+      }
     };
 
     fetchQuestions();
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (questions[currentQuestion].answer === selectedOption) {
       setScore(score + 1);
     }
@@ -29,7 +33,24 @@ const QuizPage = () => {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedOption("");
     } else {
-      setMessage(`Quiz beendet! Dein Score: ${score + 1}`);
+      const finalScore = score + 1; // Finalen Punktestand berechnen
+      setMessage(`Quiz beendet! Dein Score: ${finalScore}`);
+
+      // Punktestand an das Backend senden
+      const token = localStorage.getItem('token');
+      try {
+        await fetch('http://localhost:5000/users/quiz/score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ score: finalScore }),
+        });
+        console.log('Punktestand erfolgreich gespeichert!');
+      } catch (error) {
+        console.error('Fehler beim Speichern des Punktestands:', error);
+      }
     }
   };
 
