@@ -5,6 +5,8 @@ import RegisterPage from './pages/RegisterPage';
 import TestPage from './pages/TestPage';
 import LoginPage from './pages/LoginPage'; 
 import QuizPage from './pages/QuizPage'; // Importiere die QuizPage-Komponente
+import ProfilePage from './pages/ProfilePage';
+
 
 const App = () => {
   return (
@@ -16,6 +18,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/test" element={<TestPage />} />
         <Route path="/quiz" element={<QuizPage />} /> {/* Route für Quiz */}
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );

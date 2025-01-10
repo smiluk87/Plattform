@@ -60,5 +60,28 @@ router.post('/quiz/score', verifyToken, (req, res) => {
   res.json({ message: `Punkte gespeichert: ${score}` });
 });
 
+// Geschützte Route: Benutzerprofil anzeigen
+router.get('/profile', verifyToken, (req, res) => {
+  const user = {
+    id: req.user.id,
+    username: req.user.username,
+    email: "testuser@example.com" // Beispiel-E-Mail, später dynamisch aus Datenbank
+  };
+  res.json(user);
+});
+
+// Geschützte Route: Benutzerprofil bearbeiten
+router.put('/profile', verifyToken, (req, res) => {
+  const { username, email } = req.body;
+
+  // Validierung der Felder
+  if (!username || !email) {
+    return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
+  }
+
+  // Beispiel: Erfolgreiche Aktualisierung simulieren
+  res.json({ message: 'Profil erfolgreich aktualisiert!', updatedUser: { username, email } });
+});
+
 
 module.exports = router;
