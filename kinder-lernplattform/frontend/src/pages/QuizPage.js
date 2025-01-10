@@ -40,7 +40,7 @@ const QuizPage = () => {
       // Fortschritt an das Backend senden
       const token = localStorage.getItem('token');
       try {
-        await fetch('http://localhost:5000/users/progress', {
+        const res = await fetch('http://localhost:5000/users/progress', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -51,6 +51,11 @@ const QuizPage = () => {
             score: finalScore,
           }),
         });
+  
+        const data = await res.json();
+        if (data.reward) {
+          alert(`Herzlichen Glückwunsch! Du hast eine ${data.reward} erhalten!`);
+        }
         console.log('Fortschritt erfolgreich gespeichert!');
       } catch (error) {
         console.error('Fehler beim Speichern des Fortschritts:', error);

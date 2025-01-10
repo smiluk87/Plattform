@@ -1,0 +1,17 @@
+//GET /Progress: 
+GET http://localhost:5000/users/progress
+Authorization: Bearer <JWT_Token>
+
+//POST /progress (Fortschritt speichern)
+POST http://localhost:5000/users/progress
+Content-Type: application/json
+Authorization: Bearer <JWT_Token>
+
+{
+  "category": "math",
+  "score": 8
+}
+
+//GET /profile (Benutzerprofil anzeigen)
+GET http://localhost:5000/users/profile
+Authorization: Bearer <JWT_Token>
