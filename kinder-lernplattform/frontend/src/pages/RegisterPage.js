@@ -15,7 +15,7 @@ const RegisterPage = () => {
         email,
         password,
       });
-      setMessage('Erfolgreich registriert!'); // Erfolgsmeldung anzeigen
+      setMessage('Erfolgreich registriert! Sie können sich jetzt anmelden.'); // Erfolgsmeldung anzeigen
       console.log('Erfolgreich registriert:', response.data);
     } catch (error) {
       setMessage('Fehler bei der Registrierung.'); // Fehlermeldung anzeigen
