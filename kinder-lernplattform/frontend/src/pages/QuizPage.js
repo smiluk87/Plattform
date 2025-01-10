@@ -28,31 +28,35 @@ const QuizPage = () => {
     if (questions[currentQuestion].answer === selectedOption) {
       setScore(score + 1);
     }
-
+  
     if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedOption("");
     } else {
       const finalScore = score + 1; // Finalen Punktestand berechnen
       setMessage(`Quiz beendet! Dein Score: ${finalScore}`);
-
-      // Punktestand an das Backend senden
+  
+      // Fortschritt an das Backend senden
       const token = localStorage.getItem('token');
       try {
-        await fetch('http://localhost:5000/users/quiz/score', {
+        await fetch('http://localhost:5000/users/progress', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ score: finalScore }),
+          body: JSON.stringify({
+            category: "math", // Angepasste Kategorie
+            score: finalScore,
+          }),
         });
-        console.log('Punktestand erfolgreich gespeichert!');
+        console.log('Fortschritt erfolgreich gespeichert!');
       } catch (error) {
-        console.error('Fehler beim Speichern des Punktestands:', error);
+        console.error('Fehler beim Speichern des Fortschritts:', error);
       }
     }
   };
+  
 
   return (
     <div>

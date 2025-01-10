@@ -6,6 +6,7 @@ import TestPage from './pages/TestPage';
 import LoginPage from './pages/LoginPage'; 
 import QuizPage from './pages/QuizPage'; // Importiere die QuizPage-Komponente
 import ProfilePage from './pages/ProfilePage';
+import ProgressPage from './pages/ProgressPage'; // Importiere die Fortschrittsseite
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/test" element={<TestPage />} />
         <Route path="/quiz" element={<QuizPage />} /> {/* Route für Quiz */}
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/progress" element={<ProgressPage />} /> {/* Fortschrittsseite */}
       </Routes>
     </Router>
   );

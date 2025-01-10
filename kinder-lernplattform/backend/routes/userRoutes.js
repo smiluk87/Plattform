@@ -83,5 +83,40 @@ router.put('/profile', verifyToken, (req, res) => {
   res.json({ message: 'Profil erfolgreich aktualisiert!', updatedUser: { username, email } });
 });
 
+// Fortschrittsdaten (Simulierte Datenbank)
+const userProgress = {};
+
+// Route zum Speichern des Fortschritts
+router.post('/progress', verifyToken, (req, res) => {
+  const { category, score } = req.body;
+
+  if (!category || score === undefined) {
+    return res.status(400).json({ message: 'Kategorie und Punkte sind erforderlich!' });
+  }
+
+  const userId = req.user.id;
+
+  if (!userProgress[userId]) {
+    userProgress[userId] = [];
+  }
+
+  const progressEntry = {
+    category,
+    score,
+    timestamp: new Date().toISOString(),
+  };
+
+  userProgress[userId].push(progressEntry);
+
+  res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress: progressEntry });
+});
+
+// Route zum Abrufen des Fortschritts
+router.get('/progress', verifyToken, (req, res) => {
+  const userId = req.user.id;
+  const progress = userProgress[userId] || [];
+  res.json(progress);
+});
+
 
 module.exports = router;

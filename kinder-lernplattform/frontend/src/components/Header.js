@@ -16,7 +16,9 @@ const Header = () => {
         <Link to="/login">Login</Link> |{' '}
         <Link to="/test">Testseite</Link> |{' '}
         <Link to="/quiz">Quiz</Link> |{' '}
-        <Link to="/profile">Profil</Link>
+        <Link to="/profile">Profil</Link> |{' '}
+        <Link to="/progress">Fortschritt</Link> | {/* Neuer Link */}
+
         {localStorage.getItem('token') && (
           <button onClick={handleLogout} style={{ marginLeft: '10px' }}>
             Logout
