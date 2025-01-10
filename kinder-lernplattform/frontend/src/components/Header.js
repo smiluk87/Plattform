@@ -1,7 +1,28 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
-  return <h1>Willkommen auf der Lernplattform!</h1>;
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Entferne den Token
+    window.location.href = '/login'; // Weiterleitung zur Login-Seite
+  };
+
+  return (
+    <header>
+      <h1>Willkommen auf der Lernplattform!</h1>
+      <nav>
+        <Link to="/">Startseite</Link> |{' '}
+        <Link to="/register">Registrieren</Link> |{' '}
+        <Link to="/login">Login</Link> |{' '}
+        <Link to="/test">Testseite</Link>
+        {localStorage.getItem('token') && (
+          <button onClick={handleLogout} style={{ marginLeft: '10px' }}>
+            Logout
+          </button>
+        )}
+      </nav>
+    </header>
+  );
 };
 
 export default Header;

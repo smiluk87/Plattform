@@ -28,4 +28,36 @@ router.get('/dashboard', verifyToken, (req, res) => {
   res.json({ message: `Willkommen, ${req.user.username}!` });
 });
 
+// Quizfragen (Beispieldaten)
+const quizData = {
+  math: [
+    { question: "Was ist 2 + 2?", options: ["3", "4", "5"], answer: "4" },
+    { question: "Was ist 10 - 5?", options: ["3", "4", "5"], answer: "5" },
+  ],
+  english: [
+    { question: "What is the opposite of 'hot'?", options: ["cold", "warm", "cool"], answer: "cold" },
+    { question: "Which article fits: '___ apple'?", options: ["A", "An", "The"], answer: "An" },
+  ],
+};
+
+// Endpunkt, um Quizfragen zu holen
+router.get('/quiz/:subject', verifyToken, (req, res) => {
+  const subject = req.params.subject;
+  const questions = quizData[subject];
+  
+  if (!questions) {
+    return res.status(404).json({ message: "Thema nicht gefunden!" });
+  }
+
+  res.json(questions);
+});
+
+// Endpunkt, um Punkte zu speichern (optional)
+router.post('/quiz/score', verifyToken, (req, res) => {
+  const { score } = req.body;
+  // Hier könntest du den Score in der Datenbank speichern
+  res.json({ message: `Punkte gespeichert: ${score}` });
+});
+
+
 module.exports = router;
