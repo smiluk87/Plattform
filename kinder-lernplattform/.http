@@ -1,11 +1,11 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer <JWT_Token>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
 
 //POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer <JWT_Token>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
 
 {
   "category": "math",
@@ -14,4 +14,4 @@ Authorization: Bearer <JWT_Token>
 
 //GET /profile (Benutzerprofil anzeigen)
 GET http://localhost:5000/users/profile
-Authorization: Bearer <JWT_Token>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU0NzY0MCwiZXhwIjoxNzM2NTUxMjQwfQ.4-jry7PdvRQQ345D5d92ggoeQDv7h8tvoeXuYrpc6Po
