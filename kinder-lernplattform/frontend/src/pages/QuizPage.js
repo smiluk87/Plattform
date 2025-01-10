@@ -10,6 +10,7 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('token');
+      console.log("Token:", token); // Debugging
       try {
         const res = await fetch('http://localhost:5000/users/quiz/math', {
           headers: { Authorization: `Bearer ${token}` },
