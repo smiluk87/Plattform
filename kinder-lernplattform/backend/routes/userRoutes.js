@@ -6,21 +6,24 @@ const verifyToken = require('../middlewares/authMiddleware');
 // Route für die Registrierung
 router.post('/register', (req, res) => {
   const { username, email, password } = req.body;
-  //überprüfe, ob alle Felder ausgefüllt sind
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
-
-  // Simuliere eine erfolgreiche Registrierung
   res.status(201).json({ message: 'Benutzer erfolgreich registriert!' });
 });
 
 // Route für den Login
 router.post('/login', (req, res) => {
-  const user = { id: 1, username: 'testuser' }; // Beispiel-Benutzer
+  const user = { id: 1, username: 'testuser' };
   const token = generateToken(user);
-
   res.json({ token });
+});
+
+// Refresh Token-Endpunkt
+router.post('/refresh', verifyToken, (req, res) => {
+  const user = req.user; // Vom Middleware bereitgestellt
+  const newToken = generateToken(user); // Neuen Token generieren
+  res.json({ token: newToken });
 });
 
 // Geschützte Route (Dashboard)
@@ -45,9 +48,9 @@ const quizData = {
 router.get('/quiz/:subject', verifyToken, (req, res) => {
   const subject = req.params.subject;
   const questions = quizData[subject];
-  
+
   if (!questions) {
-    return res.status(404).json({ message: "Thema nicht gefunden!" });
+    return res.status(404).json({ message: 'Thema nicht gefunden!' });
   }
 
   res.json(questions);
@@ -56,7 +59,6 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
 // Endpunkt, um Punkte zu speichern (optional)
 router.post('/quiz/score', verifyToken, (req, res) => {
   const { score } = req.body;
-  // Hier könntest du den Score in der Datenbank speichern
   res.json({ message: `Punkte gespeichert: ${score}` });
 });
 
@@ -65,7 +67,7 @@ router.get('/profile', verifyToken, (req, res) => {
   const user = {
     id: req.user.id,
     username: req.user.username,
-    email: "testuser@example.com" // Beispiel-E-Mail, später dynamisch aus Datenbank
+    email: 'testuser@example.com',
   };
   res.json(user);
 });
@@ -74,12 +76,10 @@ router.get('/profile', verifyToken, (req, res) => {
 router.put('/profile', verifyToken, (req, res) => {
   const { username, email } = req.body;
 
-  // Validierung der Felder
   if (!username || !email) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
 
-  // Beispiel: Erfolgreiche Aktualisierung simulieren
   res.json({ message: 'Profil erfolgreich aktualisiert!', updatedUser: { username, email } });
 });
 
@@ -108,7 +108,6 @@ router.post('/progress', verifyToken, (req, res) => {
 
   userProgress[userId].push(progressEntry);
 
-  // Meilenstein-Belohnungen
   let reward = null;
   if (score >= 10) {
     reward = 'Goldmedaille';
@@ -121,17 +120,15 @@ router.post('/progress', verifyToken, (req, res) => {
   res.status(201).json({
     message: 'Fortschritt erfolgreich gespeichert!',
     progress: progressEntry,
-    reward, // Belohnung wird mit der Antwort zurückgegeben
+    reward,
   });
 });
-
 
 // Route zum Abrufen des Fortschritts
 router.get('/progress', verifyToken, (req, res) => {
   const userId = req.user.id;
   const progress = userProgress[userId] || [];
 
-  // Statistiken berechnen
   const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
   const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
   const highestScore = progress.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
@@ -146,7 +143,5 @@ router.get('/progress', verifyToken, (req, res) => {
     },
   });
 });
-
-
 
 module.exports = router;
