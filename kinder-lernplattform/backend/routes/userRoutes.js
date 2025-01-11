@@ -130,8 +130,23 @@ router.post('/progress', verifyToken, (req, res) => {
 router.get('/progress', verifyToken, (req, res) => {
   const userId = req.user.id;
   const progress = userProgress[userId] || [];
-  res.json(progress);
+
+  // Statistiken berechnen
+  const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
+  const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
+  const highestScore = progress.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
+  const attempts = progress.length;
+
+  res.json({
+    progress,
+    statistics: {
+      averageScore,
+      highestScore,
+      attempts,
+    },
+  });
 });
+
 
 
 module.exports = router;

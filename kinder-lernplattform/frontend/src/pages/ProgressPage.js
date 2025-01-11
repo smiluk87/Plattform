@@ -15,6 +15,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const ProgressPage = () => {
   const [progress, setProgress] = useState([]);
+  const [statistics, setStatistics] = useState({}); // Statistiken speichern
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -25,7 +26,8 @@ const ProgressPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        setProgress(data);
+        setProgress(data.progress);
+        setStatistics(data.statistics); // Statistiken vom Backend übernehmen
       } catch (err) {
         setError('Fehler beim Abrufen der Fortschrittsdaten.');
       }
@@ -55,6 +57,12 @@ const ProgressPage = () => {
     <div>
       <h1>Fortschritt</h1>
       {error && <p>{error}</p>}
+      <div>
+        <h3>Statistiken:</h3>
+        <p><strong>Durchschnittlicher Score:</strong> {statistics.averageScore}</p>
+        <p><strong>Höchster Score:</strong> {statistics.highestScore}</p>
+        <p><strong>Anzahl der Versuche:</strong> {statistics.attempts}</p>
+      </div>
       {progress.length > 0 ? (
         <>
           <Bar
