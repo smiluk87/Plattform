@@ -1,11 +1,11 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMTIxMSwiZXhwIjoxNzM2NjM0ODExfQ.OSbqafi1xeC8ePeA5syuBBI3OiQ9do_2ktVzRP2S3Vo
 
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzMyNCwiZXhwIjoxNzM2NjM2OTI0fQ.LzlGumg1gOQE_7cxGMrLzpTikhmo2SMuaE7yM92Eo7s
 {
   "category": "math",
   "score": 8
@@ -13,12 +13,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 
 ### GET /profile (Benutzerprofil anzeigen)
 GET http://localhost:5000/users/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+
 
 ### Test 1: Score = 3 (Bronzemedaille)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+
 {
   "category": "math",
   "score": 3
@@ -27,7 +29,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 ### Test 2: Score = 5 (Silbermedaille)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+
 
 {
   "category": "math",
@@ -37,7 +40,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 ### Test 3: Score = 10 (Goldmedaille)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjU1MTg5OSwiZXhwIjoxNzM2NTU1NDk5fQ.pXe2DksGhVOa1V0WvpmtycxD4jUb3rncO1U-fu4CyTE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+
 {
   "category": "math",
   "score": 10
@@ -46,4 +50,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 
 ### Token-Refresh testen
 POST http://localhost:5000/users/refresh
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMTIxMSwiZXhwIjoxNzM2NjM0ODExfQ.OSbqafi1xeC8ePeA5syuBBI3OiQ9do_2ktVzRP2S3Vo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+
