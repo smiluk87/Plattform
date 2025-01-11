@@ -1,11 +1,11 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMTIxMSwiZXhwIjoxNzM2NjM0ODExfQ.OSbqafi1xeC8ePeA5syuBBI3OiQ9do_2ktVzRP2S3Vo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzNjE1OCwiZXhwIjoxNzM2NjM5NzU4fQ.Od2ZINL_qdt_x7fQ5JGs-xkW-fAF1vT05nBse6GMSzc
 
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzMyNCwiZXhwIjoxNzM2NjM2OTI0fQ.LzlGumg1gOQE_7cxGMrLzpTikhmo2SMuaE7yM92Eo7s
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzNjE1OCwiZXhwIjoxNzM2NjM5NzU4fQ.Od2ZINL_qdt_x7fQ5JGs-xkW-fAF1vT05nBse6GMSzc
 {
   "category": "math",
   "score": 8
@@ -13,7 +13,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 
 ### GET /profile (Benutzerprofil anzeigen)
 GET http://localhost:5000/users/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMzAxNCwiZXhwIjoxNzM2NjM2NjE0fQ.zZAfq_yuzGvcZP1yhz600YU4tqz3KLxQPPpqk3NEkD0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzNTEzOSwiZXhwIjoxNzM2NjM4NzM5fQ.q9aOTpmD9bnVrxUsSpIEqYM3kVZN2u9P2d_SjX_NJPs
 
 
 ### Test 1: Score = 3 (Bronzemedaille)
