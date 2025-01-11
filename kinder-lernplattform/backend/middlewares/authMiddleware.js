@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET; //Secret aus Umgebungsvariablen laden 
+const JWT_SECRET = process.env.JWT_SECRET; // Secret aus Umgebungsvariablen laden 
 
 function verifyToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1]; // Bearer-Token extrahieren
@@ -18,3 +18,5 @@ function verifyToken(req, res, next) {
     next();
   });
 }
+
+module.exports = verifyToken; // Hier wird die Funktion exportiert
