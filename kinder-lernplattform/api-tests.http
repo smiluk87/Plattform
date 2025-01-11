@@ -42,3 +42,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
   "category": "math",
   "score": 10
 }
+
+
+### Token-Refresh testen
+POST http://localhost:5000/users/refresh
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzMTIxMSwiZXhwIjoxNzM2NjM0ODExfQ.OSbqafi1xeC8ePeA5syuBBI3OiQ9do_2ktVzRP2S3Vo
