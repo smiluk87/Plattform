@@ -2,91 +2,98 @@ import React, { useState, useEffect } from 'react';
 
 const QuizPage = () => {
   const [questions, setQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedOption, setSelectedOption] = useState("");
-  const [message, setMessage] = useState("");
+  const [selectedOption, setSelectedOption] = useState('');
+  const [message, setMessage] = useState('');
 
+  // Fragen aus der API laden
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('token');
-      console.log("Token:", token); // Debugging
       try {
-        const res = await fetch('http://localhost:5000/users/quiz/math', {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await fetch('http://localhost:5000/users/quiz/math', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        const data = await res.json();
+        if (!response.ok) {
+          throw new Error('Fehler beim Abrufen der Fragen');
+        }
+        const data = await response.json();
         setQuestions(data);
       } catch (error) {
-        console.error("Fehler beim Abrufen der Quizfragen:", error);
+        console.error('Fehler beim Abrufen der Quizfragen:', error);
+        setMessage('Fehler beim Laden der Quizfragen.');
       }
     };
 
     fetchQuestions();
   }, []);
 
-  const handleSubmit = async () => {
-    if (questions[currentQuestion].answer === selectedOption) {
+  // Antwort verarbeiten
+  const handleSubmitAnswer = () => {
+    if (selectedOption === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
     }
-  
-    if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedOption("");
+
+    if (currentQuestionIndex + 1 < questions.length) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedOption('');
     } else {
-      const finalScore = score + 1; // Finalen Punktestand berechnen
-      setMessage(`Quiz beendet! Dein Score: ${finalScore}`);
-  
-      // Fortschritt an das Backend senden
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch('http://localhost:5000/users/progress', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            category: "math", // Angepasste Kategorie
-            score: finalScore,
-          }),
-        });
-  
-        const data = await res.json();
-        if (data.reward) {
-          alert(`Herzlichen Glückwunsch! Du hast eine ${data.reward} erhalten!`);
-        }
-        console.log('Fortschritt erfolgreich gespeichert!');
-      } catch (error) {
-        console.error('Fehler beim Speichern des Fortschritts:', error);
-      }
+      setMessage(`Quiz beendet! Dein Punktestand: ${score + 1}`);
+      saveProgress(score + 1);
     }
   };
-  
-  
+
+  // Fortschritt speichern
+  const saveProgress = async (finalScore) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:5000/users/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ category: 'math', score: finalScore }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);
+        if (data.reward) {
+          alert(`Belohnung: ${data.reward}`);
+        }
+      } else {
+        console.error('Fehler beim Speichern des Fortschritts');
+      }
+    } catch (error) {
+      console.error('Fehler beim Speichern des Fortschritts:', error);
+    }
+  };
+
+  if (questions.length === 0) {
+    return <p>{message || 'Lade Fragen...'}</p>;
+  }
 
   return (
     <div>
       <h1>Quiz</h1>
-      {questions.length > 0 && currentQuestion < questions.length ? (
-        <div>
-          <h2>{questions[currentQuestion].question}</h2>
-          {questions[currentQuestion].options.map((option, index) => (
-            <div key={index}>
-              <input
-                type="radio"
-                value={option}
-                checked={selectedOption === option}
-                onChange={(e) => setSelectedOption(e.target.value)}
-              />
-              {option}
-            </div>
-          ))}
-          <button onClick={handleSubmit}>Antwort abschicken</button>
+      <h2>{questions[currentQuestionIndex].question}</h2>
+      {questions[currentQuestionIndex].options.map((option, index) => (
+        <div key={index}>
+          <input
+            type="radio"
+            value={option}
+            checked={selectedOption === option}
+            onChange={(e) => setSelectedOption(e.target.value)}
+          />
+          {option}
         </div>
-      ) : (
-        <p>{message || "Quiz wird geladen..."}</p>
-      )}
+      ))}
+      <button onClick={handleSubmitAnswer} disabled={!selectedOption}>
+        Antwort abschicken
+      </button>
     </div>
   );
 };
