@@ -3,32 +3,44 @@ import React, { useState, useEffect } from 'react';
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [category, setCategory] = useState(''); // Kategorie-Filter
+  const [page, setPage] = useState(1); // Aktuelle Seite
+  const [totalPages, setTotalPages] = useState(1); // Gesamte Seitenzahl
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const url = category
-          ? `http://localhost:5000/users/leaderboard/${category}`
-          : 'http://localhost:5000/users/leaderboard';
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  const fetchLeaderboard = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const url = category
+        ? `http://localhost:5000/users/leaderboard/${category}?page=${page}&limit=5`
+        : `http://localhost:5000/users/leaderboard?page=${page}&limit=5`;
 
-        if (!res.ok) {
-          throw new Error('Fehler beim Abrufen der Rangliste.');
-        }
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const data = await res.json();
-        setLeaderboard(data);
-      } catch (err) {
-        setError(err.message);
+      if (!res.ok) {
+        throw new Error('Fehler beim Abrufen der Rangliste.');
       }
-    };
 
+      const data = await res.json();
+      setLeaderboard(data.leaderboard);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
     fetchLeaderboard();
-  }, [category]); // Neu laden, wenn sich die Kategorie ändert
+  }, [category, page]); // Neu laden, wenn sich die Kategorie oder die Seite ändert
+
+  const handlePrevious = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
 
   return (
     <div>
@@ -39,7 +51,10 @@ const LeaderboardPage = () => {
         <select
           id="category"
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setPage(1); // Zurück zur ersten Seite wechseln
+          }}
         >
           <option value="">Alle Kategorien</option>
           <option value="math">Mathe</option>
@@ -70,7 +85,7 @@ const LeaderboardPage = () => {
                     : 'transparent',
               }}
             >
-              <td>{index + 1}</td>
+              <td>{index + 1 + (page - 1) * 5}</td>
               <td>{user.username}</td>
               <td>{user.totalScore}</td>
               <td>{user.reward || '—'}</td>
@@ -78,6 +93,17 @@ const LeaderboardPage = () => {
           ))}
         </tbody>
       </table>
+      <div>
+        <button onClick={handlePrevious} disabled={page === 1}>
+          Vorherige
+        </button>
+        <span>
+          Seite {page} von {totalPages}
+        </span>
+        <button onClick={handleNext} disabled={page === totalPages}>
+          Nächste
+        </button>
+      </div>
     </div>
   );
 };

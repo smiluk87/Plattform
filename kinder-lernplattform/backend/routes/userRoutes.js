@@ -104,9 +104,11 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
-// Ranglisten-Logik mit Kategorien-Filterung und Belohnungen
+// Ranglisten-Logik mit Kategorien-Filterung, Belohnungen und Paginierung
 router.get('/leaderboard/:category?', verifyToken, (req, res) => {
   const category = req.params.category; // Optionaler Kategorie-Filter
+  const { page = 1, limit = 10 } = req.query; // Standard: Seite 1, 10 Einträge pro Seite
+
   const allUsersProgress = Object.entries(userProgress);
 
   const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
@@ -133,10 +135,17 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
     else if (index === 2) user.reward = 'Bronze';
   });
 
-  // Beschränke die Anzeige auf die Top 10
-  const top10 = validLeaderboard.slice(0, 10);
+  // Paginierung anwenden
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + parseInt(limit);
+  const paginatedLeaderboard = validLeaderboard.slice(startIndex, endIndex);
 
-  res.json(top10);
+  res.json({
+    leaderboard: paginatedLeaderboard,
+    totalEntries: validLeaderboard.length,
+    currentPage: parseInt(page),
+    totalPages: Math.ceil(validLeaderboard.length / limit),
+  });
 });
 
 // Geschützte Route: Benutzerprofil anzeigen
