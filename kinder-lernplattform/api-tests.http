@@ -21,6 +21,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 GET http://localhost:5000/users/leaderboard
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcxODQ1MSwiZXhwIjoxNzM2NzIyMDUxfQ.osvBPw6XFMirLGxmTgXpgGzuQMq_ZaHRoU7lTmtujdc
 
+### Ranglisten mit Kategorie "math" abrufen
+GET http://localhost:5000/users/leaderboard/math
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyMTYzNCwiZXhwIjoxNzM2NzI1MjM0fQ.3bY9lYaGII2p_kF3KS0ho1Xa7Gg7J5slT4uE4-H-fPg
+
+### Ranglisten mit Kategorie "english" abrufen
+GET http://localhost:5000/users/leaderboard/english
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyMTYzNCwiZXhwIjoxNzM2NzI1MjM0fQ.3bY9lYaGII2p_kF3KS0ho1Xa7Gg7J5slT4uE4-H-fPg
+
+### Gesamtrangliste abrufen
+GET http://localhost:5000/users/leaderboard
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyMTYzNCwiZXhwIjoxNzM2NzI1MjM0fQ.3bY9lYaGII2p_kF3KS0ho1Xa7Gg7J5slT4uE4-H-fPg
+
 
 
 
