@@ -104,19 +104,30 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
-// Ranglisten-Logik (mit mehreren Benutzern)
-router.get('/leaderboard', verifyToken, (req, res) => {
+// Ranglisten-Logik mit Kategorien-Filterung
+router.get('/leaderboard/:category?', verifyToken, (req, res) => {
+  const category = req.params.category; // Optionaler Kategorie-Filter
   const allUsersProgress = Object.entries(userProgress);
 
   const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
-    const totalScore = progressEntries.reduce((sum, entry) => sum + entry.score, 0);
+    // Filter nach Kategorie, falls angegeben
+    const filteredEntries = category
+      ? progressEntries.filter(entry => entry.category === category)
+      : progressEntries;
+
+    const totalScore = filteredEntries.reduce((sum, entry) => sum + entry.score, 0);
     const username = users[userId]; // Benutzername aus der simulierten Datenbank
     return { userId, username, totalScore };
   });
 
-  leaderboard.sort((a, b) => b.totalScore - a.totalScore);
+  // Nur Benutzer mit Punkten anzeigen
+  const validLeaderboard = leaderboard.filter(user => user.totalScore > 0);
 
-  const top10 = leaderboard.slice(0, 10);
+  // Sortiere nach Gesamtpunkten absteigend
+  validLeaderboard.sort((a, b) => b.totalScore - a.totalScore);
+
+  // Beschränke die Anzeige auf die Top 10
+  const top10 = validLeaderboard.slice(0, 10);
 
   res.json(top10);
 });
