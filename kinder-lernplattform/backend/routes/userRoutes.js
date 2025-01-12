@@ -146,14 +146,16 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
-// Ranglisten-Logik (Beispieldaten)
+// Ranglisten-Logik mit Benutzernamen (Beispieldaten)
 router.get('/leaderboard', verifyToken, (req, res) => {
   const allUsersProgress = Object.entries(userProgress);
 
   // Berechne die Gesamtpunkte jedes Benutzers
   const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
     const totalScore = progressEntries.reduce((sum, entry) => sum + entry.score, 0);
-    return { userId, totalScore };
+    // Simulierter Benutzername (später aus der Datenbank abrufen)
+    const username = `user${userId}`; 
+    return { userId, username, totalScore };
   });
 
   // Sortiere nach Gesamtpunkten absteigend

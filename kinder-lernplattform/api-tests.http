@@ -1,6 +1,6 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcwMTc2NiwiZXhwIjoxNzM2NzA1MzY2fQ.PiIASNzj8i4w3Dh9bYnPPj63nZ7IyBwLjRvd_D-4U1U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcwNTQ5MiwiZXhwIjoxNzM2NzA5MDkyfQ.QfSsusGhnn0-eNAbArUWbwKnKbEYmESn2lPF6V14NkM
 
 ### Quizfragen Englisch testen 
 GET http://localhost:5000/users/quiz/english
@@ -13,7 +13,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 
 ### Ranglisten überprüfen
 GET http://localhost:5000/users/leaderboard
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcwMTc2NiwiZXhwIjoxNzM2NzA1MzY2fQ.PiIASNzj8i4w3Dh9bYnPPj63nZ7IyBwLjRvd_D-4U1U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcwNTYyOCwiZXhwIjoxNzM2NzA5MjI4fQ.zTXQjsRKPY7U5cJCZ1gusR5ou1PbxvRDV9kSZqUDv0U
 
 
 ###POST /progress (Fortschritt speichern)
