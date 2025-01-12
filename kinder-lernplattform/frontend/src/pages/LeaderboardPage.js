@@ -29,7 +29,7 @@ const LeaderboardPage = () => {
         <thead>
           <tr>
             <th>Platz</th>
-            <th>Benutzer-ID</th>
+            <th>Benutzername</th> {/* Spaltenkopf für Benutzernamen */}
             <th>Gesamtpunkte</th>
           </tr>
         </thead>
@@ -37,7 +37,7 @@ const LeaderboardPage = () => {
           {leaderboard.map((user, index) => (
             <tr key={user.userId}>
               <td>{index + 1}</td>
-              <td>{user.userId}</td>
+              <td>{user.username}</td> {/* Benutzername anzeigen */}
               <td>{user.totalScore}</td>
             </tr>
           ))}
