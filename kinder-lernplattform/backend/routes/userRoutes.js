@@ -121,4 +121,33 @@ router.get('/leaderboard', verifyToken, (req, res) => {
   res.json(top10);
 });
 
+// Geschützte Route: Benutzerprofil anzeigen
+router.get('/profile', verifyToken, (req, res) => {
+  const userId = req.user.id; // Angemeldeter Benutzer
+  const username = users[userId] || `user${userId}`; // Simulierter Benutzername
+  const email = `${username}@example.com`; // Simulierte E-Mail
+
+  res.json({
+    id: userId,
+    username,
+    email,
+  });
+});
+
+// Geschützte Route: Benutzerprofil bearbeiten
+router.put('/profile', verifyToken, (req, res) => {
+  const { username, email } = req.body;
+
+  // Validierung der Eingabefelder
+  if (!username || !email) {
+    return res.status(400).json({ message: 'Benutzername und E-Mail sind erforderlich!' });
+  }
+
+  // Simuliere das Aktualisieren des Profils
+  res.json({
+    message: 'Profil erfolgreich aktualisiert!',
+    updatedUser: { username, email },
+  });
+});
+
 module.exports = router;
