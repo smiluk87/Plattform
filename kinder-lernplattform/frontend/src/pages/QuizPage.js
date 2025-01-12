@@ -5,23 +5,22 @@ const QuizPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState('');
+  const [category, setCategory] = useState('math'); // Standardkategorie
   const [message, setMessage] = useState('');
 
-  // Fragen aus der API laden
+  // Fragen basierend auf Kategorie laden
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://localhost:5000/users/quiz/math', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch(`http://localhost:5000/users/quiz/${category}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        if (!response.ok) {
-          throw new Error('Fehler beim Abrufen der Fragen');
-        }
-        const data = await response.json();
+        const data = await res.json();
         setQuestions(data);
+        setCurrentQuestionIndex(0); // Index zurücksetzen
+        setScore(0); // Punktestand zurücksetzen
+        setSelectedOption(''); // Auswahl zurücksetzen
       } catch (error) {
         console.error('Fehler beim Abrufen der Quizfragen:', error);
         setMessage('Fehler beim Laden der Quizfragen.');
@@ -29,9 +28,8 @@ const QuizPage = () => {
     };
 
     fetchQuestions();
-  }, []);
+  }, [category]); // API-Aufruf bei Kategorieänderung
 
-  // Antwort verarbeiten
   const handleSubmitAnswer = () => {
     if (selectedOption === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
@@ -46,26 +44,23 @@ const QuizPage = () => {
     }
   };
 
-  // Fortschritt speichern
   const saveProgress = async (finalScore) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/users/progress', {
+      const res = await fetch('http://localhost:5000/users/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ category: 'math', score: finalScore }),
+        body: JSON.stringify({ category, score: finalScore }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        alert(data.message);
+      if (res.ok) {
+        const data = await res.json();
+        alert(`Fortschritt gespeichert: ${data.message}`);
         if (data.reward) {
           alert(`Belohnung: ${data.reward}`);
         }
-      } else {
-        console.error('Fehler beim Speichern des Fortschritts');
       }
     } catch (error) {
       console.error('Fehler beim Speichern des Fortschritts:', error);
@@ -79,6 +74,13 @@ const QuizPage = () => {
   return (
     <div>
       <h1>Quiz</h1>
+      <div>
+        <label>Wähle eine Kategorie:</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="math">Mathe</option>
+          <option value="english">Englisch</option>
+        </select>
+      </div>
       <h2>{questions[currentQuestionIndex].question}</h2>
       {questions[currentQuestionIndex].options.map((option, index) => (
         <div key={index}>
