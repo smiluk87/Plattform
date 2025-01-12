@@ -1,11 +1,11 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzNjE1OCwiZXhwIjoxNzM2NjM5NzU4fQ.Od2ZINL_qdt_x7fQ5JGs-xkW-fAF1vT05nBse6GMSzc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjY5NTc5MiwiZXhwIjoxNzM2Njk5MzkyfQ.yA74Mx8qgoq-L0BToRarWLQxmSAowEJOKpWBgOyXSpg
 
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjYzNjE1OCwiZXhwIjoxNzM2NjM5NzU4fQ.Od2ZINL_qdt_x7fQ5JGs-xkW-fAF1vT05nBse6GMSzc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjY5NTc5MiwiZXhwIjoxNzM2Njk5MzkyfQ.yA74Mx8qgoq-L0BToRarWLQxmSAowEJOKpWBgOyXSpg
 {
   "category": "math",
   "score": 8
