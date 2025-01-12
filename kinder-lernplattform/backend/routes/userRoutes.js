@@ -146,4 +146,23 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
+// Ranglisten-Logik (Beispieldaten)
+router.get('/leaderboard', verifyToken, (req, res) => {
+  const allUsersProgress = Object.entries(userProgress);
+
+  // Berechne die Gesamtpunkte jedes Benutzers
+  const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
+    const totalScore = progressEntries.reduce((sum, entry) => sum + entry.score, 0);
+    return { userId, totalScore };
+  });
+
+  // Sortiere nach Gesamtpunkten absteigend
+  leaderboard.sort((a, b) => b.totalScore - a.totalScore);
+
+  // Beschränke die Anzeige auf die Top 10
+  const top10 = leaderboard.slice(0, 10);
+
+  res.json(top10);
+});
+
 module.exports = router;

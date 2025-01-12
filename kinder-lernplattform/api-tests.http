@@ -7,6 +7,15 @@ GET http://localhost:5000/users/quiz/english
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjY5NTc5MiwiZXhwIjoxNzM2Njk5MzkyfQ.yA74Mx8qgoq-L0BToRarWLQxmSAowEJOKpWBgOyXSpg
 
 
+### Fortschritt überprüfen
+GET http://localhost:5000/users/progress
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjY5NTc5MiwiZXhwIjoxNzM2Njk5MzkyfQ.yA74Mx8qgoq-L0BToRarWLQxmSAowEJOKpWBgOyXSpg
+
+### Ranglisten überprüfen
+GET http://localhost:5000/users/leaderboard
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjY5NTc5MiwiZXhwIjoxNzM2Njk5MzkyfQ.yA74Mx8qgoq-L0BToRarWLQxmSAowEJOKpWBgOyXSpg
+
+
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json
