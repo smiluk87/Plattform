@@ -104,7 +104,7 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
-// Ranglisten-Logik mit Kategorien-Filterung
+// Ranglisten-Logik mit Kategorien-Filterung und Belohnungen
 router.get('/leaderboard/:category?', verifyToken, (req, res) => {
   const category = req.params.category; // Optionaler Kategorie-Filter
   const allUsersProgress = Object.entries(userProgress);
@@ -125,6 +125,13 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
 
   // Sortiere nach Gesamtpunkten absteigend
   validLeaderboard.sort((a, b) => b.totalScore - a.totalScore);
+
+  // Füge Belohnungen hinzu
+  validLeaderboard.forEach((user, index) => {
+    if (index === 0) user.reward = 'Gold';
+    else if (index === 1) user.reward = 'Silber';
+    else if (index === 2) user.reward = 'Bronze';
+  });
 
   // Beschränke die Anzeige auf die Top 10
   const top10 = validLeaderboard.slice(0, 10);

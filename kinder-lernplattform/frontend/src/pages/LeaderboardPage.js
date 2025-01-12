@@ -52,14 +52,28 @@ const LeaderboardPage = () => {
             <th>Platz</th>
             <th>Benutzername</th>
             <th>Gesamtpunkte</th>
+            <th>Belohnung</th>
           </tr>
         </thead>
         <tbody>
           {leaderboard.map((user, index) => (
-            <tr key={user.userId}>
+            <tr
+              key={user.userId}
+              style={{
+                backgroundColor:
+                  user.reward === 'Gold'
+                    ? '#FFD700'
+                    : user.reward === 'Silber'
+                    ? '#C0C0C0'
+                    : user.reward === 'Bronze'
+                    ? '#CD7F32'
+                    : 'transparent',
+              }}
+            >
               <td>{index + 1}</td>
               <td>{user.username}</td>
               <td>{user.totalScore}</td>
+              <td>{user.reward || '—'}</td>
             </tr>
           ))}
         </tbody>
