@@ -7,7 +7,7 @@ import LoginPage from './pages/LoginPage';
 import QuizPage from './pages/QuizPage'; // Importiere die QuizPage-Komponente
 import ProfilePage from './pages/ProfilePage';
 import ProgressPage from './pages/ProgressPage'; // Importiere die Fortschrittsseite
-
+import LeaderboardPage from './pages/LeaderboardPage'; // Importiere die Seite
 
 const App = () => {
   return (
@@ -21,6 +21,7 @@ const App = () => {
         <Route path="/quiz" element={<QuizPage />} /> {/* Route für Quiz */}
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/progress" element={<ProgressPage />} /> {/* Fortschrittsseite */}
+        <Route path="/leaderboard" element={<LeaderboardPage />} /> {/* Leaderboardseite */}
       </Routes>
     </Router>
   );
