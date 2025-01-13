@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [category, setCategory] = useState(''); // Kategorie-Filter
-  const [search, setSearch] = useState(''); // Suchfeld
-  const [page, setPage] = useState(1); // Aktuelle Seite
-  const [totalPages, setTotalPages] = useState(1); // Gesamte Seitenzahl
-  const [error, setError] = useState(''); // Fehleranzeige
+  const [category, setCategory] = useState('');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState('');
 
   // Fetch-Funktion für die Rangliste
-  const fetchLeaderboard = async () => {
-    const token = localStorage.getItem('token'); // Token für die Authentifizierung
+  const fetchLeaderboard = useCallback(async () => {
+    const token = localStorage.getItem('token');
     try {
-      // Dynamischer URL-Aufbau basierend auf Filter- und Suchparametern
       const url = `http://localhost:5000/users/leaderboard${category ? `/${category}` : ''}?page=${page}&limit=5&search=${search}`;
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -28,14 +27,13 @@ const LeaderboardPage = () => {
     } catch (err) {
       setError(err.message);
     }
-  };
+  }, [category, page, search]);
 
   // Effect-Hook, um Daten zu laden, wenn Filter/Suche/Seite geändert werden
   useEffect(() => {
     fetchLeaderboard();
-  }, [category, page, search]);
+  }, [fetchLeaderboard]);
 
-  // Funktionen für die Navigation zwischen Seiten
   const handlePrevious = () => {
     if (page > 1) setPage(page - 1);
   };
@@ -55,7 +53,7 @@ const LeaderboardPage = () => {
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
-            setPage(1); // Zurück zur ersten Seite, wenn sich die Kategorie ändert
+            setPage(1);
           }}
         >
           <option value="">Alle Kategorien</option>
@@ -71,7 +69,7 @@ const LeaderboardPage = () => {
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setPage(1); // Zurück zur ersten Seite, wenn sich der Suchbegriff ändert
+            setPage(1);
           }}
           placeholder="Benutzername eingeben"
         />
