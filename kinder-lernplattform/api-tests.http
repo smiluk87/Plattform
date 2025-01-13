@@ -33,9 +33,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 GET http://localhost:5000/users/leaderboard
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyMTYzNCwiZXhwIjoxNzM2NzI1MjM0fQ.3bY9lYaGII2p_kF3KS0ho1Xa7Gg7J5slT4uE4-H-fPg
 
+### Paginierungslogik für alle Kategorie 
+GET /users/leaderboard?page=1&limit=5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyNzIzMSwiZXhwIjoxNzM2NzMwODMxfQ.FGOE8cowfj4R2Au3P8ojjbeFIP0AW-WNVYjBrVjJ8SA
 
-
-
+### Paginierungslogik für Kategorie math 
+GET /users/leaderboard/math?page=2&limit=3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyNzIzMSwiZXhwIjoxNzM2NzMwODMxfQ.FGOE8cowfj4R2Au3P8ojjbeFIP0AW-WNVYjBrVjJ8SA
 
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
