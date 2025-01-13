@@ -156,7 +156,7 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
 });
 
 // Neue Route für Benutzerstatistiken
-router.get('/users/:id/statistics', verifyToken, (req, res) => {
+router.get('/:id/statistics', verifyToken, (req, res) => {
   const userId = req.params.id;
   const user = users[userId];
 
@@ -179,33 +179,6 @@ router.get('/users/:id/statistics', verifyToken, (req, res) => {
     averageScore,
     categoryProgress,
     attempts: progress.length,
-  });
-});
-
-// Benutzerprofil anzeigen
-router.get('/profile', verifyToken, (req, res) => {
-  const userId = req.user.id;
-  const username = users[userId] || `user${userId}`;
-  const email = `${username}@example.com`;
-
-  res.json({
-    id: userId,
-    username,
-    email,
-  });
-});
-
-// Benutzerprofil bearbeiten
-router.put('/profile', verifyToken, (req, res) => {
-  const { username, email } = req.body;
-
-  if (!username || !email) {
-    return res.status(400).json({ message: 'Benutzername und E-Mail sind erforderlich!' });
-  }
-
-  res.json({
-    message: 'Profil erfolgreich aktualisiert!',
-    updatedUser: { username, email },
   });
 });
 
