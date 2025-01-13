@@ -41,6 +41,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 GET /users/leaderboard/math?page=2&limit=3
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjcyNzQxMSwiZXhwIjoxNzM2NzMxMDExfQ.2SH70gaSXUyuoIz-bFXvLIMoGUb6RFaWzED5LiDCd0A
 
+### Paginierung mit Suche 
+GET /users/leaderboard?page=1&limit=5&search=John
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNjc5OTY0MCwiZXhwIjoxNzM2ODAzMjQwfQ.DT8qp6aksdEpuGGQ6LoaYXwjJ01HlZPwoMvfL5xm_A4
+
+
 ###POST /progress (Fortschritt speichern)
 POST http://localhost:5000/users/progress
 Content-Type: application/json

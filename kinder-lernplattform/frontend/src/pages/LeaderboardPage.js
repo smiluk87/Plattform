@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [category, setCategory] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [error, setError] = useState('');
+  const [category, setCategory] = useState(''); // Kategorie-Filter
+  const [search, setSearch] = useState(''); // Suchfeld
+  const [page, setPage] = useState(1); // Aktuelle Seite
+  const [totalPages, setTotalPages] = useState(1); // Gesamte Seitenzahl
+  const [error, setError] = useState(''); // Fehleranzeige
 
+  // Fetch-Funktion für die Rangliste
   const fetchLeaderboard = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token'); // Token für die Authentifizierung
     try {
-      const url = category
-        ? `http://localhost:5000/users/leaderboard/${category}?page=${page}&limit=5`
-        : `http://localhost:5000/users/leaderboard?page=${page}&limit=5`;
-
+      // Dynamischer URL-Aufbau basierend auf Filter- und Suchparametern
+      const url = `http://localhost:5000/users/leaderboard${category ? `/${category}` : ''}?page=${page}&limit=5&search=${search}`;
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -30,10 +30,12 @@ const LeaderboardPage = () => {
     }
   };
 
+  // Effect-Hook, um Daten zu laden, wenn Filter/Suche/Seite geändert werden
   useEffect(() => {
     fetchLeaderboard();
-  }, [category, page]);
+  }, [category, page, search]);
 
+  // Funktionen für die Navigation zwischen Seiten
   const handlePrevious = () => {
     if (page > 1) setPage(page - 1);
   };
@@ -45,7 +47,7 @@ const LeaderboardPage = () => {
   return (
     <div>
       <h1>Rangliste</h1>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <div>
         <label htmlFor="category">Kategorie wählen:</label>
         <select
@@ -53,13 +55,26 @@ const LeaderboardPage = () => {
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
-            setPage(1);
+            setPage(1); // Zurück zur ersten Seite, wenn sich die Kategorie ändert
           }}
         >
           <option value="">Alle Kategorien</option>
           <option value="math">Mathe</option>
           <option value="english">Englisch</option>
         </select>
+      </div>
+      <div>
+        <label htmlFor="search">Benutzer suchen:</label>
+        <input
+          type="text"
+          id="search"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1); // Zurück zur ersten Seite, wenn sich der Suchbegriff ändert
+          }}
+          placeholder="Benutzername eingeben"
+        />
       </div>
       <table>
         <thead>
