@@ -17,48 +17,18 @@ const users = {
   "10": "Olivia",
 };
 
-// Simulierte Fortschrittsdaten (erweitert)
+// Simulierte Fortschrittsdaten
 const userProgress = {
-  "1": [
-    { category: "math", score: 3, timestamp: new Date().toISOString() },
-    { category: "english", score: 5, timestamp: new Date().toISOString() },
-  ],
-  "2": [
-    { category: "math", score: 8, timestamp: new Date().toISOString() },
-    { category: "english", score: 7, timestamp: new Date().toISOString() },
-  ],
-  "3": [
-    { category: "math", score: 2, timestamp: new Date().toISOString() },
-    { category: "english", score: 4, timestamp: new Date().toISOString() },
-  ],
-  "4": [
-    { category: "math", score: 12, timestamp: new Date().toISOString() },
-    { category: "english", score: 8, timestamp: new Date().toISOString() },
-  ],
-  "5": [
-    { category: "math", score: 10, timestamp: new Date().toISOString() },
-    { category: "english", score: 11, timestamp: new Date().toISOString() },
-  ],
-  "6": [
-    { category: "math", score: 15, timestamp: new Date().toISOString() },
-    { category: "english", score: 5, timestamp: new Date().toISOString() },
-  ],
-  "7": [
-    { category: "math", score: 18, timestamp: new Date().toISOString() },
-    { category: "english", score: 9, timestamp: new Date().toISOString() },
-  ],
-  "8": [
-    { category: "math", score: 12, timestamp: new Date().toISOString() },
-    { category: "english", score: 7, timestamp: new Date().toISOString() },
-  ],
-  "9": [
-    { category: "math", score: 14, timestamp: new Date().toISOString() },
-    { category: "english", score: 6, timestamp: new Date().toISOString() },
-  ],
-  "10": [
-    { category: "math", score: 19, timestamp: new Date().toISOString() },
-    { category: "english", score: 10, timestamp: new Date().toISOString() },
-  ],
+  "1": [{ category: "math", score: 3 }, { category: "english", score: 5 }],
+  "2": [{ category: "math", score: 8 }, { category: "english", score: 7 }],
+  "3": [{ category: "math", score: 2 }, { category: "english", score: 4 }],
+  "4": [{ category: "math", score: 12 }, { category: "english", score: 8 }],
+  "5": [{ category: "math", score: 10 }, { category: "english", score: 11 }],
+  "6": [{ category: "math", score: 15 }, { category: "english", score: 5 }],
+  "7": [{ category: "math", score: 18 }, { category: "english", score: 9 }],
+  "8": [{ category: "math", score: 12 }, { category: "english", score: 7 }],
+  "9": [{ category: "math", score: 14 }, { category: "english", score: 6 }],
+  "10": [{ category: "math", score: 19 }, { category: "english", score: 10 }],
 };
 
 // Route für die Registrierung
@@ -139,10 +109,10 @@ router.get('/progress', verifyToken, (req, res) => {
   });
 });
 
-// Ranglisten-Logik mit Kategorien-Filterung, Belohnungen und Paginierung
+// Ranglisten-Logik mit Kategorien-Filterung, Suche und Paginierung
 router.get('/leaderboard/:category?', verifyToken, (req, res) => {
   const category = req.params.category;
-  const { page = 1, limit = 5 } = req.query;
+  const { page = 1, limit = 5, search = '' } = req.query;
 
   const allUsersProgress = Object.entries(userProgress);
 
@@ -156,7 +126,14 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
     return { userId, username, totalScore };
   });
 
-  const validLeaderboard = leaderboard.filter(user => user.totalScore > 0);
+  let validLeaderboard = leaderboard.filter(user => user.totalScore > 0);
+
+  // Filterung nach Benutzername (Suchparameter)
+  if (search) {
+    validLeaderboard = validLeaderboard.filter(user =>
+      user.username.toLowerCase().includes(search.toLowerCase())
+    );
+  }
 
   validLeaderboard.sort((a, b) => b.totalScore - a.totalScore);
 
