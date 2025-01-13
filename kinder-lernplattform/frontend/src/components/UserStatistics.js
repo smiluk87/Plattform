@@ -6,32 +6,39 @@ const UserStatistics = ({ userId, onClose }) => {
 
   useEffect(() => {
     const fetchStatistics = async () => {
-      const token = localStorage.getItem('token');
+      
       try {
+        const token = localStorage.getItem('token');
+        console.log("Gesendeter Token:", token); // Debugging
         const res = await fetch(`http://localhost:5000/users/${userId}/statistics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          throw new Error('Fehler beim Abrufen der Benutzerstatistiken.');
+          throw new Error(`Fehler: ${res.status}`);
         }
 
         const data = await res.json();
+        console.log("Erhaltene Daten:", data); // Debuggin
         setStatistics(data);
       } catch (err) {
+        console.error("Fehler beim Abrufen der Statistiken:", err.message);
         setError(err.message);
       }
     };
 
-    fetchStatistics();
+    // Aufruf der Fetch-Funktion
+    if (userId) {
+        fetchStatistics();
+      }
   }, [userId]);
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="user-statistics-error">{error}</div>;
   }
 
   if (!statistics) {
-    return <div>Laden...</div>;
+    return <div className="user-statistics-loading">Laden...</div>;
   }
 
   return (

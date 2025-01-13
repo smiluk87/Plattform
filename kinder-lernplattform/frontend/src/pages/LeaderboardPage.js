@@ -44,11 +44,32 @@ const LeaderboardPage = () => {
   };
 
   const openUserStatistics = (userId) => {
+    console.log(`Benutzer mit ID ${userId} ausgewählt`); // Debugging
     setSelectedUser(userId);
   };
 
   const closeUserStatistics = () => {
     setSelectedUser(null);
+  };
+
+  // Debugging: Benutzerstatistiken abrufen
+  const handleUserClick = async (userId) => {
+    console.log(`Statistiken für Benutzer ID ${userId} abrufen`); // Debugging
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/users/${userId}/statistics`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Fehler: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Benutzerstatistiken:", data);
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Statistiken:", error.message);
+    }
   };
 
   return (
@@ -97,7 +118,10 @@ const LeaderboardPage = () => {
             leaderboard.map((user, index) => (
               <tr
                 key={user.userId}
-                onClick={() => openUserStatistics(user.userId)} // Benutzerklick
+                onClick={() => {
+                  openUserStatistics(user.userId);
+                  handleUserClick(user.userId); // Debugging: Abruf der Statistiken
+                }}
                 style={{
                   backgroundColor:
                     user.reward === 'Gold'
