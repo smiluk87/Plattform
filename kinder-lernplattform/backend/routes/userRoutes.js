@@ -10,6 +10,11 @@ const users = {
   "3": "Tom",
   "4": "Lisa",
   "5": "John",
+  "6": "Sophia",
+  "7": "Paul",
+  "8": "Emma",
+  "9": "Chris",
+  "10": "Olivia",
 };
 
 // Simulierte Fortschrittsdaten (erweitert)
@@ -34,6 +39,26 @@ const userProgress = {
     { category: "math", score: 10, timestamp: new Date().toISOString() },
     { category: "english", score: 11, timestamp: new Date().toISOString() },
   ],
+  "6": [
+    { category: "math", score: 15, timestamp: new Date().toISOString() },
+    { category: "english", score: 5, timestamp: new Date().toISOString() },
+  ],
+  "7": [
+    { category: "math", score: 18, timestamp: new Date().toISOString() },
+    { category: "english", score: 9, timestamp: new Date().toISOString() },
+  ],
+  "8": [
+    { category: "math", score: 12, timestamp: new Date().toISOString() },
+    { category: "english", score: 7, timestamp: new Date().toISOString() },
+  ],
+  "9": [
+    { category: "math", score: 14, timestamp: new Date().toISOString() },
+    { category: "english", score: 6, timestamp: new Date().toISOString() },
+  ],
+  "10": [
+    { category: "math", score: 19, timestamp: new Date().toISOString() },
+    { category: "english", score: 10, timestamp: new Date().toISOString() },
+  ],
 };
 
 // Route für die Registrierung
@@ -47,7 +72,7 @@ router.post('/register', (req, res) => {
 
 // Route für den Login
 router.post('/login', (req, res) => {
-  const user = { id: 1, username: 'testuser' }; // Beispiel-Benutzer
+  const user = { id: 1, username: 'testuser' };
   const token = generateToken(user);
   res.json({ token });
 });
@@ -116,8 +141,8 @@ router.get('/progress', verifyToken, (req, res) => {
 
 // Ranglisten-Logik mit Kategorien-Filterung, Belohnungen und Paginierung
 router.get('/leaderboard/:category?', verifyToken, (req, res) => {
-  const category = req.params.category; // Optionaler Kategorie-Filter
-  const { page = 1, limit = 5 } = req.query; // Standard: Seite 1, 5 Einträge pro Seite
+  const category = req.params.category;
+  const { page = 1, limit = 5 } = req.query;
 
   const allUsersProgress = Object.entries(userProgress);
 
