@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import UserStatistics from '../components/UserStatistics'; // Import der neuen Komponente
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -7,6 +8,7 @@ const LeaderboardPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
+  const [selectedUser, setSelectedUser] = useState(null); // Für Benutzerstatistiken
 
   // Fetch-Funktion für die Rangliste
   const fetchLeaderboard = useCallback(async () => {
@@ -29,7 +31,6 @@ const LeaderboardPage = () => {
     }
   }, [category, page, search]);
 
-  // Effect-Hook, um Daten zu laden, wenn Filter/Suche/Seite geändert werden
   useEffect(() => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
@@ -40,6 +41,14 @@ const LeaderboardPage = () => {
 
   const handleNext = () => {
     if (page < totalPages) setPage(page + 1);
+  };
+
+  const openUserStatistics = (userId) => {
+    setSelectedUser(userId);
+  };
+
+  const closeUserStatistics = () => {
+    setSelectedUser(null);
   };
 
   return (
@@ -88,6 +97,7 @@ const LeaderboardPage = () => {
             leaderboard.map((user, index) => (
               <tr
                 key={user.userId}
+                onClick={() => openUserStatistics(user.userId)} // Benutzerklick
                 style={{
                   backgroundColor:
                     user.reward === 'Gold'
@@ -97,6 +107,7 @@ const LeaderboardPage = () => {
                       : user.reward === 'Bronze'
                       ? '#CD7F32'
                       : 'transparent',
+                  cursor: 'pointer',
                 }}
               >
                 <td>{index + 1 + (page - 1) * 5}</td>
@@ -125,6 +136,9 @@ const LeaderboardPage = () => {
           Nächste
         </button>
       </div>
+      {selectedUser && (
+        <UserStatistics userId={selectedUser} onClose={closeUserStatistics} />
+      )}
     </div>
   );
 };

@@ -155,7 +155,34 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
   });
 });
 
-// Geschützte Route: Benutzerprofil anzeigen
+// Neue Route für Benutzerstatistiken
+router.get('/users/:id/statistics', verifyToken, (req, res) => {
+  const userId = req.params.id;
+  const user = users[userId];
+
+  if (!user) {
+    return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+  }
+
+  const progress = userProgress[userId] || [];
+  const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
+  const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
+
+  const categoryProgress = progress.reduce((acc, entry) => {
+    acc[entry.category] = (acc[entry.category] || 0) + entry.score;
+    return acc;
+  }, {});
+
+  res.json({
+    username: user,
+    totalScores,
+    averageScore,
+    categoryProgress,
+    attempts: progress.length,
+  });
+});
+
+// Benutzerprofil anzeigen
 router.get('/profile', verifyToken, (req, res) => {
   const userId = req.user.id;
   const username = users[userId] || `user${userId}`;
@@ -168,7 +195,7 @@ router.get('/profile', verifyToken, (req, res) => {
   });
 });
 
-// Geschützte Route: Benutzerprofil bearbeiten
+// Benutzerprofil bearbeiten
 router.put('/profile', verifyToken, (req, res) => {
   const { username, email } = req.body;
 
