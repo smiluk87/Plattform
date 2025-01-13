@@ -7,23 +7,33 @@ const verifyToken = require('../middlewares/authMiddleware');
 const users = {
   "1": "Max",
   "2": "Anna",
-  "3": "Tom"
+  "3": "Tom",
+  "4": "Lisa",
+  "5": "John",
 };
 
-// Simulierte Fortschrittsdaten (für mehrere Benutzer)
+// Simulierte Fortschrittsdaten (erweitert)
 const userProgress = {
   "1": [
     { category: "math", score: 3, timestamp: new Date().toISOString() },
-    { category: "english", score: 5, timestamp: new Date().toISOString() }
+    { category: "english", score: 5, timestamp: new Date().toISOString() },
   ],
   "2": [
     { category: "math", score: 8, timestamp: new Date().toISOString() },
-    { category: "english", score: 7, timestamp: new Date().toISOString() }
+    { category: "english", score: 7, timestamp: new Date().toISOString() },
   ],
   "3": [
     { category: "math", score: 2, timestamp: new Date().toISOString() },
-    { category: "english", score: 4, timestamp: new Date().toISOString() }
-  ]
+    { category: "english", score: 4, timestamp: new Date().toISOString() },
+  ],
+  "4": [
+    { category: "math", score: 12, timestamp: new Date().toISOString() },
+    { category: "english", score: 8, timestamp: new Date().toISOString() },
+  ],
+  "5": [
+    { category: "math", score: 10, timestamp: new Date().toISOString() },
+    { category: "english", score: 11, timestamp: new Date().toISOString() },
+  ],
 };
 
 // Route für die Registrierung
@@ -107,35 +117,30 @@ router.get('/progress', verifyToken, (req, res) => {
 // Ranglisten-Logik mit Kategorien-Filterung, Belohnungen und Paginierung
 router.get('/leaderboard/:category?', verifyToken, (req, res) => {
   const category = req.params.category; // Optionaler Kategorie-Filter
-  const { page = 1, limit = 10 } = req.query; // Standard: Seite 1, 10 Einträge pro Seite
+  const { page = 1, limit = 5 } = req.query; // Standard: Seite 1, 5 Einträge pro Seite
 
   const allUsersProgress = Object.entries(userProgress);
 
   const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
-    // Filter nach Kategorie, falls angegeben
     const filteredEntries = category
       ? progressEntries.filter(entry => entry.category === category)
       : progressEntries;
 
     const totalScore = filteredEntries.reduce((sum, entry) => sum + entry.score, 0);
-    const username = users[userId]; // Benutzername aus der simulierten Datenbank
+    const username = users[userId];
     return { userId, username, totalScore };
   });
 
-  // Nur Benutzer mit Punkten anzeigen
   const validLeaderboard = leaderboard.filter(user => user.totalScore > 0);
 
-  // Sortiere nach Gesamtpunkten absteigend
   validLeaderboard.sort((a, b) => b.totalScore - a.totalScore);
 
-  // Füge Belohnungen hinzu
   validLeaderboard.forEach((user, index) => {
     if (index === 0) user.reward = 'Gold';
     else if (index === 1) user.reward = 'Silber';
     else if (index === 2) user.reward = 'Bronze';
   });
 
-  // Paginierung anwenden
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + parseInt(limit);
   const paginatedLeaderboard = validLeaderboard.slice(startIndex, endIndex);
@@ -150,9 +155,9 @@ router.get('/leaderboard/:category?', verifyToken, (req, res) => {
 
 // Geschützte Route: Benutzerprofil anzeigen
 router.get('/profile', verifyToken, (req, res) => {
-  const userId = req.user.id; // Angemeldeter Benutzer
-  const username = users[userId] || `user${userId}`; // Simulierter Benutzername
-  const email = `${username}@example.com`; // Simulierte E-Mail
+  const userId = req.user.id;
+  const username = users[userId] || `user${userId}`;
+  const email = `${username}@example.com`;
 
   res.json({
     id: userId,
@@ -165,12 +170,10 @@ router.get('/profile', verifyToken, (req, res) => {
 router.put('/profile', verifyToken, (req, res) => {
   const { username, email } = req.body;
 
-  // Validierung der Eingabefelder
   if (!username || !email) {
     return res.status(400).json({ message: 'Benutzername und E-Mail sind erforderlich!' });
   }
 
-  // Simuliere das Aktualisieren des Profils
   res.json({
     message: 'Profil erfolgreich aktualisiert!',
     updatedUser: { username, email },

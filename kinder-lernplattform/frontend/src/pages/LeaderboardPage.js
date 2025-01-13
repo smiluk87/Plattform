@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
-  const [category, setCategory] = useState(''); // Kategorie-Filter
-  const [page, setPage] = useState(1); // Aktuelle Seite
-  const [totalPages, setTotalPages] = useState(1); // Gesamte Seitenzahl
+  const [category, setCategory] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
 
   const fetchLeaderboard = async () => {
@@ -32,7 +32,7 @@ const LeaderboardPage = () => {
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [category, page]); // Neu laden, wenn sich die Kategorie oder die Seite ändert
+  }, [category, page]);
 
   const handlePrevious = () => {
     if (page > 1) setPage(page - 1);
@@ -53,7 +53,7 @@ const LeaderboardPage = () => {
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
-            setPage(1); // Zurück zur ersten Seite wechseln
+            setPage(1);
           }}
         >
           <option value="">Alle Kategorien</option>
@@ -71,26 +71,34 @@ const LeaderboardPage = () => {
           </tr>
         </thead>
         <tbody>
-          {leaderboard.map((user, index) => (
-            <tr
-              key={user.userId}
-              style={{
-                backgroundColor:
-                  user.reward === 'Gold'
-                    ? '#FFD700'
-                    : user.reward === 'Silber'
-                    ? '#C0C0C0'
-                    : user.reward === 'Bronze'
-                    ? '#CD7F32'
-                    : 'transparent',
-              }}
-            >
-              <td>{index + 1 + (page - 1) * 5}</td>
-              <td>{user.username}</td>
-              <td>{user.totalScore}</td>
-              <td>{user.reward || '—'}</td>
+          {leaderboard.length > 0 ? (
+            leaderboard.map((user, index) => (
+              <tr
+                key={user.userId}
+                style={{
+                  backgroundColor:
+                    user.reward === 'Gold'
+                      ? '#FFD700'
+                      : user.reward === 'Silber'
+                      ? '#C0C0C0'
+                      : user.reward === 'Bronze'
+                      ? '#CD7F32'
+                      : 'transparent',
+                }}
+              >
+                <td>{index + 1 + (page - 1) * 5}</td>
+                <td>{user.username}</td>
+                <td>{user.totalScore}</td>
+                <td>{user.reward || '—'}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" style={{ textAlign: 'center' }}>
+                Keine weiteren Ergebnisse
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
       <div>
