@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import UserStatistics from '../components/UserStatistics'; // Import der neuen Komponente
+import UserStatistics from '../components/UserStatistics';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -8,9 +8,8 @@ const LeaderboardPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null); // Für Benutzerstatistiken
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Fetch-Funktion für die Rangliste
   const fetchLeaderboard = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
@@ -44,32 +43,11 @@ const LeaderboardPage = () => {
   };
 
   const openUserStatistics = (userId) => {
-    console.log(`Benutzer mit ID ${userId} ausgewählt`); // Debugging
     setSelectedUser(userId);
   };
 
   const closeUserStatistics = () => {
     setSelectedUser(null);
-  };
-
-  // Debugging: Benutzerstatistiken abrufen
-  const handleUserClick = async (userId) => {
-    console.log(`Statistiken für Benutzer ID ${userId} abrufen`); // Debugging
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/users/${userId}/statistics`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Fehler: ${res.status}`);
-      }
-
-      const data = await res.json();
-      console.log("Benutzerstatistiken:", data);
-    } catch (error) {
-      console.error("Fehler beim Abrufen der Statistiken:", error.message);
-    }
   };
 
   return (
@@ -118,10 +96,7 @@ const LeaderboardPage = () => {
             leaderboard.map((user, index) => (
               <tr
                 key={user.userId}
-                onClick={() => {
-                  openUserStatistics(user.userId);
-                  handleUserClick(user.userId); // Debugging: Abruf der Statistiken
-                }}
+                onClick={() => openUserStatistics(user.userId)}
                 style={{
                   backgroundColor:
                     user.reward === 'Gold'
