@@ -47,38 +47,29 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
-// Route zum Abrufen des Benutzerprofils
-router.get('/profile', verifyToken, async (req, res) => {
-  try {
-      const user = await User.findById(req.user.id).select('-password');
-      if (!user) {
-          return res.status(404).json({ message: 'Benutzer nicht gefunden' });
-      }
-      res.json(user);
-  } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Serverfehler');
+// Profil abrufen
+router.get('/profile', verifyToken, (req, res) => {
+  const userId = req.user.id; // ID aus dem Token
+  const username = users[userId]; // Benutzername aus der simulierten Datenbank
+
+  if (!username) {
+    return res.status(404).json({ message: 'Benutzer nicht gefunden' });
   }
+
+  res.json({ username, email: `${username.toLowerCase()}@example.com` }); // Beispiel-Email
 });
 
-
-// Route zum Aktualisieren des Benutzerprofils
-router.put('/profile', verifyToken, async (req, res) => {
+// Profil aktualisieren
+router.put('/profile', verifyToken, (req, res) => {
   const { username, email } = req.body;
+  const userId = req.user.id;
 
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { username, email },
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
-    }
-    res.json({ message: 'Profil erfolgreich aktualisiert', user });
-  } catch (error) {
-    res.status(500).json({ message: 'Fehler beim Aktualisieren des Profils', error });
+  if (!users[userId]) {
+    return res.status(404).json({ message: 'Benutzer nicht gefunden' });
   }
+
+  users[userId] = username; // Update nur den Namen in der simulierten Datenbank
+  res.json({ message: 'Profil erfolgreich aktualisiert', username, email });
 });
 
 // Geschützte Route (Dashboard)
