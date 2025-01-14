@@ -5,10 +5,12 @@ const ProfilePage = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
+      setLoading(true);
       try {
         const res = await fetch('http://localhost:5000/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
@@ -20,8 +22,11 @@ const ProfilePage = () => {
 
         const data = await res.json();
         setUserData({ username: data.username, email: data.email });
+        setError('');
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -30,6 +35,7 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     const token = localStorage.getItem('token');
+    setLoading(true);
     try {
       const res = await fetch('http://localhost:5000/users/profile', {
         method: 'PUT',
@@ -46,9 +52,13 @@ const ProfilePage = () => {
 
       const data = await res.json();
       setMessage(data.message);
+      setError('');
       setEditMode(false);
     } catch (err) {
       setError(err.message);
+      setMessage('');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,37 +67,73 @@ const ProfilePage = () => {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '1rem' }}>
       <h1>Profil</h1>
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
+      {loading && <p>Laden...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
+
       <form>
-        <div>
-          <label>Benutzername:</label>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Benutzername:</label>
           <input
             type="text"
             name="username"
             value={userData.username}
             onChange={handleChange}
             disabled={!editMode}
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+            }}
           />
         </div>
-        <div>
-          <label>Email:</label>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email:</label>
           <input
             type="email"
             name="email"
             value={userData.email}
             onChange={handleChange}
             disabled={!editMode}
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+            }}
           />
         </div>
         {editMode ? (
-          <button type="button" onClick={handleSave}>
+          <button
+            type="button"
+            onClick={handleSave}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#007BFF',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
             Speichern
           </button>
         ) : (
-          <button type="button" onClick={() => setEditMode(true)}>
+          <button
+            type="button"
+            onClick={() => setEditMode(true)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
             Bearbeiten
           </button>
         )}

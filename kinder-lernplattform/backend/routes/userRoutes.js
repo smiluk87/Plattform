@@ -47,6 +47,38 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
+// Route zum Abrufen des Benutzerprofils
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+    res.json({ username: user.username, email: user.email });
+  } catch (error) {
+    res.status(500).json({ message: 'Fehler beim Abrufen des Profils', error });
+  }
+});
+
+// Route zum Aktualisieren des Benutzerprofils
+router.put('/profile', verifyToken, async (req, res) => {
+  const { username, email } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { username, email },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+    res.json({ message: 'Profil erfolgreich aktualisiert', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Fehler beim Aktualisieren des Profils', error });
+  }
+});
+
 // Geschützte Route (Dashboard)
 router.get('/dashboard', verifyToken, (req, res) => {
   res.json({ message: `Willkommen, ${req.user.username}!` });
