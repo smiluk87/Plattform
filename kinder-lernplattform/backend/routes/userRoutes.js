@@ -50,15 +50,17 @@ router.post('/login', (req, res) => {
 // Route zum Abrufen des Benutzerprofils
 router.get('/profile', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
-    }
-    res.json({ username: user.username, email: user.email });
-  } catch (error) {
-    res.status(500).json({ message: 'Fehler beim Abrufen des Profils', error });
+      const user = await User.findById(req.user.id).select('-password');
+      if (!user) {
+          return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+      }
+      res.json(user);
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Serverfehler');
   }
 });
+
 
 // Route zum Aktualisieren des Benutzerprofils
 router.put('/profile', verifyToken, async (req, res) => {
