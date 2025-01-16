@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: { // Fremdschlüssel zu "users"
+      userid: { // Fremdschlüssel zu "users"
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
