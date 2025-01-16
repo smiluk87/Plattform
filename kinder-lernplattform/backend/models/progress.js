@@ -1,25 +1,26 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Progress extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  }
-  Progress.init({
-    category: DataTypes.STRING,
-    score: DataTypes.INTEGER,
-    timestamp: DataTypes.DATE
-  }, {
-    sequelize,
-    modelName: 'Progress',
-  });
-  return Progress;
-};
+    const Progress = sequelize.define('Progress', {
+      category: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      score: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      timestamp: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+    });
+  
+    Progress.associate = (models) => {
+      Progress.belongsTo(models.User, {
+        foreignKey: 'userId',
+        onDelete: 'CASCADE',
+      });
+    };
+  
+    return Progress;
+  };
+  
