@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
 
   Progress.associate = (models) => {
     Progress.belongsTo(models.User, {
-      foreignKey: 'userId',  // Verbindung mit der users-Tabelle
-      onDelete: 'CASCADE',   // Verhalten bei Löschung eines Benutzers
+      foreignKey: 'userId',  // Verbindung mit der Tabelle "users"
+      onDelete: 'CASCADE',
     });
   };
 
