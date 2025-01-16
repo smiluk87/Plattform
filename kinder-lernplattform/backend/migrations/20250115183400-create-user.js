@@ -1,4 +1,5 @@
 'use strict';
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('users', {
@@ -23,13 +24,14 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'createdAt'
+        field: 'createdat'
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'updatedAt'
+        field: 'updatedat'
       }
+      
     });
   },
   async down(queryInterface, Sequelize) {
