@@ -123,7 +123,6 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
   res.json(questions);
 });
 
-
 // Fortschritt speichern
 router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
@@ -146,7 +145,6 @@ router.post('/progress', verifyToken, async (req, res) => {
   }
 });
 
-
 // Fortschritt abrufen
 router.get('/progress', verifyToken, async (req, res) => {
   try {
@@ -165,26 +163,28 @@ router.get('/progress', verifyToken, async (req, res) => {
   }
 });
 
-// Leaderboard
+// Rangliste abrufen
 router.get('/leaderboard', async (req, res) => {
   try {
-    const leaderboard = await db.Progress.findAll({
+    const results = await db.Progress.findAll({
       attributes: [
         'userid',
-        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore']
       ],
-      group: ['userid'],
-      include: [{ model: db.User, attributes: ['username'] }],
-      order: [[db.Sequelize.literal('totalScore'), 'DESC']],
+      include: [
+        {
+          model: db.User,
+          attributes: ['id', 'username']
+        }
+      ],
+      group: ['userid', 'User.id', 'User.username'],
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']]
     });
-    console.log('Leaderboard:', leaderboard); // Debugging
-    res.json(leaderboard);
+    res.json(results);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Rangliste:', error); // Fehlerprotokoll
+    console.error('Fehler beim Abrufen der Rangliste:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!', error: error.message });
   }
 });
-
-
 
 module.exports = router;
