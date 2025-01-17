@@ -1,14 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const verifyToken = require('../middlewares/authMiddleware');
+const { generateToken } = require('../controllers/authController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
-
-// Token-Generierung
-const generateToken = (payload) => {
-  const secret = process.env.JWT_SECRET || 'your_secret_key';
-  return jwt.sign(payload, secret, { expiresIn: '1h' });
-};
 
 // Benutzer erstellen
 router.post('/users', async (req, res) => {
