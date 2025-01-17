@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { generateToken } = require('../controllers/authController');
 const verifyToken = require('../middlewares/authMiddleware');
+const userController = require('../controllers/userController'); // Neuer Import für DB-basierte Benutzerverwaltung
 
 // Simulierte Benutzer-Datenbank
 const users = {
@@ -30,6 +31,10 @@ const userProgress = {
   "9": [{ category: "math", score: 14 }, { category: "english", score: 6 }],
   "10": [{ category: "math", score: 19 }, { category: "english", score: 10 }],
 };
+
+// DB-basierte Benutzer-Routen
+router.post('/users', userController.createUser); // Benutzer erstellen
+router.get('/users', userController.getAllUsers); // Alle Benutzer abrufen
 
 // Route für die Registrierung
 router.post('/register', (req, res) => {
