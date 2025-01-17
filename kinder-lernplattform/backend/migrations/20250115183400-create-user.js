@@ -21,12 +21,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      createdAt: {
+      createdat: { // kleinbuchstaben 
         allowNull: false,
         type: Sequelize.DATE,
         field: 'createdat'
       },
-      updatedAt: {
+      updatedAt: { //kleinbuchstaben
         allowNull: false,
         type: Sequelize.DATE,
         field: 'updatedat'

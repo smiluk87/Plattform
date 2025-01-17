@@ -1,5 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('User', {
+  const User = sequelize.define(
+    'User',
+    {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -13,7 +15,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-    });
-    return User;
-  };
-  
+    },
+    {
+      tableName: 'users', // Explizit den Tabellennamen setzen
+      underscored: true, // Nutzt snake_case für Felder
+      createdAt: 'createdat', // Mapping für die Felder
+      updatedAt: 'updatedat',
+    }
+  );
+  return User;
+};
