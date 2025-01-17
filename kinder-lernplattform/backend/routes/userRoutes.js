@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, generateToken } = require('../middlewares/authMiddleware');
+const { generateToken } = require('../controllers/authController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
 // Benutzer erstellen

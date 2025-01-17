@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { generateToken } = require('../controllers/authController'); // Import von generateToken
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
 function verifyToken(req, res, next) {
@@ -11,11 +10,11 @@ function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // Benutzerinformationen speichern
+    req.user = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Ungültiges Token!' });
   }
 }
 
-module.exports = { verifyToken, generateToken };
+module.exports = { verifyToken };

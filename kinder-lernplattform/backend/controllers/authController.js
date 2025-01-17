@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; // Fallback für den Secret-Schlüssel
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; // Fallback if not set in environment
 
 // Funktion zum Generieren eines JWT
 function generateToken(user) {
