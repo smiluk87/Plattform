@@ -40,15 +40,18 @@ router.get('/users', userController.getAllUsers); // Alle Benutzer abrufen
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
+  // Eingabedaten validieren
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
 
   try {
+    // Benutzer erstellen
     const user = await db.User.create({ username, email, password });
     res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    // Fehler behandeln (z.B. bei doppelten E-Mails)
+    res.status(500).json({ message: 'Fehler bei der Registrierung!', error: error.message });
   }
 });
 
