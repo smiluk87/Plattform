@@ -1,25 +1,40 @@
 module.exports = (sequelize, DataTypes) => {
-  const Progress = sequelize.define('Progress', {
-    category: {
-      type: DataTypes.STRING,
-      allowNull: false,
+  const Progress = sequelize.define(
+    'Progress',
+    {
+      category: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      score: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      timestamp: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      userid: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+      },
     },
-    score: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    timestamp: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-  }, {
-    tableName: 'progresses', // Tabellennamen auf Kleinbuchstaben setzen
-    timestamps: true,       // Automatische Handhabung von createdAt und updatedAt
-  });
+    {
+      tableName: 'progresses',
+      underscored: true,
+      createdAt: 'createdat', // Mapping für Datenbank
+      updatedAt: 'updatedat',
+    }
+  );
 
   Progress.associate = (models) => {
     Progress.belongsTo(models.User, {
-      foreignKey: 'userid',  // Verbindung mit der Tabelle "users"
+      foreignKey: 'userid',
       onDelete: 'CASCADE',
     });
   };
