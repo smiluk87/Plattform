@@ -8,15 +8,26 @@ const TestPage = () => {
     try {
       const res = await fetch('http://localhost:5000/users/login', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Header für JSON-Daten
+        },
+        body: JSON.stringify({
+          email: 'tada1234@gmail.com', // Testwerte (später ersetzen)
+          password: 'password123', // Testwerte (später ersetzen)
+        }),
       });
-      const data = await res.json();
-      setToken(data.token); // Token im State speichern
-      localStorage.setItem('token', data.token); // Token in localStorage speichern
+      if (res.ok) {
+        const data = await res.json();
+        setToken(data.token); // Token im State speichern
+        localStorage.setItem('token', data.token); // Token in localStorage speichern
+      } else {
+        console.error('Login fehlgeschlagen:', await res.text());
+      }
     } catch (error) {
       console.error('Fehler beim Login:', error);
     }
   };
-
+  
   const handleDashboard = async () => {
     const token = localStorage.getItem('token'); // Token aus localStorage holen
     if (!token) {

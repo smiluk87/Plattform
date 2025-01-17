@@ -17,6 +17,7 @@ const QuizPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+        console.log('Quiz-Daten:', data); // Debugging: Daten anzeigen
         setQuestions(data);
         setCurrentQuestionIndex(0); // Index zurücksetzen
         setScore(0); // Punktestand zurücksetzen
@@ -26,6 +27,7 @@ const QuizPage = () => {
         setMessage('Fehler beim Laden der Quizfragen.');
       }
     };
+    
 
     fetchQuestions();
   }, [category]); // API-Aufruf bei Kategorieänderung
