@@ -27,12 +27,12 @@ module.exports = {
       timestamp: {
         type: Sequelize.DATE,
       },
-      createdAt: {
+      createdat: {
         allowNull: false,
         type: Sequelize.DATE,
         field: 'createdat'
       },
-      updatedAt: {
+      updatedat: {
         allowNull: false,
         type: Sequelize.DATE,
         field: 'updatedat'
