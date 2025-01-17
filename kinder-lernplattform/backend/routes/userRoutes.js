@@ -2,30 +2,28 @@ const express = require('express');
 const router = express.Router();
 const { generateToken } = require('../controllers/authController');
 const verifyToken = require('../middlewares/authMiddleware');
-const db = require('../models'); // Stelle sicher, dass die Datenbank eingebunden ist
-const userController = require('../controllers/userController'); // Neuer Import für DB-basierte Benutzerverwaltung
+const db = require('../models'); // Datenbankmodelle importieren
+const userController = require('../controllers/userController'); // Benutzercontroller
 
-// DB-basierte Benutzer-Routen
-router.post('/users', userController.createUser); // Benutzer erstellen
-router.get('/users', userController.getAllUsers); // Alle Benutzer abrufen
+// Benutzer-Routen
+router.post('/users', userController.createUser);
+router.get('/users', userController.getAllUsers);
 
 // Route für die Registrierung
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
-  // Eingabedaten validieren
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
 
   try {
-    console.log("Eingehende Registrierungsdaten:", req.body); // Debugging
+    console.log("Eingehende Registrierungsdaten:", req.body);
 
-    // Benutzer erstellen
     const user = await db.User.create({ username, email, password });
     res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
   } catch (error) {
-    console.error("Fehler bei der Registrierung:", error); // Debugging
+    console.error("Fehler bei der Registrierung:", error);
     res.status(500).json({ message: 'Fehler bei der Registrierung!', error: error.message });
   }
 });
@@ -40,14 +38,14 @@ router.post('/login', (req, res) => {
 // Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id; // ID aus dem Token
-    const user = await db.User.findByPk(userId); // Suche den Benutzer in der DB
+    const userId = req.user.id;
+    const user = await db.User.findByPk(userId);
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    res.json({ username: user.username, email: user.email }); // Sende Benutzerdaten zurück
+    res.json({ username: user.username, email: user.email });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -58,8 +56,8 @@ router.put('/profile', verifyToken, async (req, res) => {
   const { username, email } = req.body;
 
   try {
-    const userId = req.user.id; // Benutzer-ID aus Token
-    const user = await db.User.findByPk(userId); // Benutzer suchen
+    const userId = req.user.id;
+    const user = await db.User.findByPk(userId);
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
@@ -67,7 +65,7 @@ router.put('/profile', verifyToken, async (req, res) => {
 
     user.username = username;
     user.email = email;
-    await user.save(); // Änderungen speichern
+    await user.save();
 
     res.json({ message: 'Profil erfolgreich aktualisiert', user });
   } catch (error) {
@@ -75,12 +73,7 @@ router.put('/profile', verifyToken, async (req, res) => {
   }
 });
 
-// Geschützte Route (Dashboard)
-router.get('/dashboard', verifyToken, (req, res) => {
-  res.json({ message: `Willkommen, ${req.user.username}!` });
-});
-
-// Quizfragen (Beispieldaten)
+// Quizfragen
 const quizData = {
   math: [
     { question: "Was ist 2 + 2?", options: ["3", "4", "5"], answer: "4" },
@@ -93,7 +86,6 @@ const quizData = {
   ],
 };
 
-// Endpunkt, um Quizfragen zu holen
 router.get('/quiz/:subject', verifyToken, (req, res) => {
   const subject = req.params.subject;
   const questions = quizData[subject];
@@ -104,37 +96,57 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
 });
 
 // Fortschritt speichern
-router.post('/progress', verifyToken, (req, res) => {
-  const { category, score } = req.body;
-  if (!category || score === undefined) {
-    return res.status(400).json({ message: 'Kategorie und Punkte sind erforderlich!' });
+router.post('/progress', verifyToken, async (req, res) => {
+  try {
+    const { category, score } = req.body;
+    const userId = req.user.id;
+
+    if (!category || score === undefined) {
+      return res.status(400).json({ message: 'Kategorie und Punkte sind erforderlich!' });
+    }
+
+    console.log("Eingehende Fortschrittsdaten:", req.body);
+    console.log("Benutzer-ID:", userId);
+
+    const progressEntry = await db.Progress.create({
+      userid: userId,
+      category,
+      score,
+      timestamp: new Date(), // Aktueller Zeitstempel
+    });
+
+    res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress: progressEntry });
+  } catch (error) {
+    console.error("Fehler beim Speichern des Fortschritts:", error);
+    res.status(500).json({ message: 'Fehler beim Speichern des Fortschritts!', error: error.message });
   }
-  const userId = req.user.id;
-  if (!userProgress[userId]) {
-    userProgress[userId] = [];
-  }
-  const progressEntry = { category, score, timestamp: new Date().toISOString() };
-  userProgress[userId].push(progressEntry);
-  res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress: progressEntry });
 });
 
 // Fortschritt abrufen
-router.get('/progress', verifyToken, (req, res) => {
-  const userId = req.user.id;
-  const progress = userProgress[userId] || [];
-  const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
-  const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
-  const highestScore = progress.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
-  const attempts = progress.length;
+router.get('/progress', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-  res.json({
-    progress,
-    statistics: {
-      averageScore,
-      highestScore,
-      attempts,
-    },
-  });
+    const progress = await db.Progress.findAll({
+      where: { userid: userId },
+    });
+
+    const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
+    const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
+    const highestScore = progress.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
+
+    res.json({
+      progress,
+      statistics: {
+        averageScore,
+        highestScore,
+        attempts: progress.length,
+      },
+    });
+  } catch (error) {
+    console.error("Fehler beim Abrufen des Fortschritts:", error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!', error: error.message });
+  }
 });
 
 module.exports = router;
