@@ -1,22 +1,20 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET; // Secret aus Umgebungsvariablen laden 
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function verifyToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1]; // Bearer-Token extrahieren
-  console.log("Empfangener Token:", token); // Debugging
-
+  const token = req.headers['authorization']?.split(' ')[1];
+  
   if (!token) {
     return res.status(403).json({ message: 'Kein Token bereitgestellt!' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Ungültiger Token!' });
-    }
-
-    req.user = decoded; // Benutzerdaten speichern
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET); // Token entschlüsseln
+    req.user = decoded; // Benutzerinformationen speichern
     next();
-  });
+  } catch (error) {
+    return res.status(401).json({ message: 'Ungültiges Token!' });
+  }
 }
 
-module.exports = verifyToken; // Hier wird die Funktion exportiert
+module.exports = verifyToken;

@@ -37,13 +37,21 @@ router.post('/users', userController.createUser); // Benutzer erstellen
 router.get('/users', userController.getAllUsers); // Alle Benutzer abrufen
 
 // Route für die Registrierung
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
+
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
-  res.status(201).json({ message: 'Benutzer erfolgreich registriert!' });
+
+  try {
+    const user = await db.User.create({ username, email, password });
+    res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
+
 
 // Route für den Login
 router.post('/login', (req, res) => {
@@ -53,16 +61,21 @@ router.post('/login', (req, res) => {
 });
 
 // Profil abrufen
-router.get('/profile', verifyToken, (req, res) => {
-  const userId = req.user.id; // ID aus dem Token
-  const username = users[userId]; // Benutzername aus der simulierten Datenbank
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id; // ID aus dem Token
+    const user = await db.User.findByPk(userId); // Suche den Benutzer in der DB
 
-  if (!username) {
-    return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    res.json({ username: user.username, email: user.email }); // Sende Benutzerdaten zurück
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  res.json({ username, email: `${username.toLowerCase()}@example.com` }); // Beispiel-Email
 });
+
 
 // Profil aktualisieren
 router.put('/profile', verifyToken, (req, res) => {
