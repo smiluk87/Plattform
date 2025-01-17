@@ -19,6 +19,12 @@ if (config.use_env_variable) {
   });
 }
 
+// Verbindungsüberprüfung hinzufügen
+sequelize
+  .authenticate()
+  .then(() => console.log('Datenbank verbunden!'))
+  .catch((err) => console.error('Fehler bei der Verbindung:', err));
+
 fs
   .readdirSync(__dirname)
   .filter(file => {
