@@ -2,35 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { generateToken } = require('../controllers/authController');
 const verifyToken = require('../middlewares/authMiddleware');
+const db = require('../models'); // Stelle sicher, dass die Datenbank eingebunden ist
 const userController = require('../controllers/userController'); // Neuer Import für DB-basierte Benutzerverwaltung
-
-// Simulierte Benutzer-Datenbank
-const users = {
-  "1": "Max",
-  "2": "Anna",
-  "3": "Tom",
-  "4": "Lisa",
-  "5": "John",
-  "6": "Sophia",
-  "7": "Paul",
-  "8": "Emma",
-  "9": "Chris",
-  "10": "Olivia",
-};
-
-// Simulierte Fortschrittsdaten
-const userProgress = {
-  "1": [{ category: "math", score: 3 }, { category: "english", score: 5 }],
-  "2": [{ category: "math", score: 8 }, { category: "english", score: 7 }],
-  "3": [{ category: "math", score: 2 }, { category: "english", score: 4 }],
-  "4": [{ category: "math", score: 12 }, { category: "english", score: 8 }],
-  "5": [{ category: "math", score: 10 }, { category: "english", score: 11 }],
-  "6": [{ category: "math", score: 15 }, { category: "english", score: 5 }],
-  "7": [{ category: "math", score: 18 }, { category: "english", score: 9 }],
-  "8": [{ category: "math", score: 12 }, { category: "english", score: 7 }],
-  "9": [{ category: "math", score: 14 }, { category: "english", score: 6 }],
-  "10": [{ category: "math", score: 19 }, { category: "english", score: 10 }],
-};
 
 // DB-basierte Benutzer-Routen
 router.post('/users', userController.createUser); // Benutzer erstellen
@@ -46,15 +19,16 @@ router.post('/register', async (req, res) => {
   }
 
   try {
+    console.log("Eingehende Registrierungsdaten:", req.body); // Debugging
+
     // Benutzer erstellen
     const user = await db.User.create({ username, email, password });
     res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
   } catch (error) {
-    // Fehler behandeln (z.B. bei doppelten E-Mails)
+    console.error("Fehler bei der Registrierung:", error); // Debugging
     res.status(500).json({ message: 'Fehler bei der Registrierung!', error: error.message });
   }
 });
-
 
 // Route für den Login
 router.post('/login', (req, res) => {
@@ -79,18 +53,26 @@ router.get('/profile', verifyToken, async (req, res) => {
   }
 });
 
-
 // Profil aktualisieren
-router.put('/profile', verifyToken, (req, res) => {
+router.put('/profile', verifyToken, async (req, res) => {
   const { username, email } = req.body;
-  const userId = req.user.id;
 
-  if (!users[userId]) {
-    return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+  try {
+    const userId = req.user.id; // Benutzer-ID aus Token
+    const user = await db.User.findByPk(userId); // Benutzer suchen
+
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    user.username = username;
+    user.email = email;
+    await user.save(); // Änderungen speichern
+
+    res.json({ message: 'Profil erfolgreich aktualisiert', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  users[userId] = username; // Update nur den Namen in der simulierten Datenbank
-  res.json({ message: 'Profil erfolgreich aktualisiert', username, email });
 });
 
 // Geschützte Route (Dashboard)
@@ -152,79 +134,6 @@ router.get('/progress', verifyToken, (req, res) => {
       highestScore,
       attempts,
     },
-  });
-});
-
-// Ranglisten-Logik mit Kategorien-Filterung, Suche und Paginierung
-router.get('/leaderboard/:category?', verifyToken, (req, res) => {
-  const category = req.params.category;
-  const { page = 1, limit = 5, search = '' } = req.query;
-
-  const allUsersProgress = Object.entries(userProgress);
-
-  const leaderboard = allUsersProgress.map(([userId, progressEntries]) => {
-    const filteredEntries = category
-      ? progressEntries.filter(entry => entry.category === category)
-      : progressEntries;
-
-    const totalScore = filteredEntries.reduce((sum, entry) => sum + entry.score, 0);
-    const username = users[userId];
-    return { userId, username, totalScore };
-  });
-
-  let validLeaderboard = leaderboard.filter(user => user.totalScore > 0);
-
-  // Filterung nach Benutzername (Suchparameter)
-  if (search) {
-    validLeaderboard = validLeaderboard.filter(user =>
-      user.username.toLowerCase().includes(search.toLowerCase())
-    );
-  }
-
-  validLeaderboard.sort((a, b) => b.totalScore - a.totalScore);
-
-  validLeaderboard.forEach((user, index) => {
-    if (index === 0) user.reward = 'Gold';
-    else if (index === 1) user.reward = 'Silber';
-    else if (index === 2) user.reward = 'Bronze';
-  });
-
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + parseInt(limit);
-  const paginatedLeaderboard = validLeaderboard.slice(startIndex, endIndex);
-
-  res.json({
-    leaderboard: paginatedLeaderboard,
-    totalEntries: validLeaderboard.length,
-    currentPage: parseInt(page),
-    totalPages: Math.ceil(validLeaderboard.length / limit),
-  });
-});
-
-// Neue Route für Benutzerstatistiken
-router.get('/:id/statistics', verifyToken, (req, res) => {
-  const userId = req.params.id;
-  const user = users[userId];
-
-  if (!user) {
-    return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-  }
-
-  const progress = userProgress[userId] || [];
-  const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
-  const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
-
-  const categoryProgress = progress.reduce((acc, entry) => {
-    acc[entry.category] = (acc[entry.category] || 0) + entry.score;
-    return acc;
-  }, {});
-
-  res.json({
-    username: user,
-    totalScores,
-    averageScore,
-    categoryProgress,
-    attempts: progress.length,
   });
 });
 
