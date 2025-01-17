@@ -17,11 +17,13 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: 'users', // Explizit den Tabellennamen setzen
-      underscored: true, // Nutzt snake_case für Felder
-      createdAt: 'createdat', // Mapping für die Felder
-      updatedAt: 'updatedat',
+      tableName: 'users', // Expliziter Tabellenname
+      underscored: true, // Nutzt snake_case für Spalten
+      timestamps: true, // Aktiviert automatisch createdAt und updatedAt
+      createdAt: 'createdat', // Mapt Sequelize's createdAt auf createdat in der DB
+      updatedAt: 'updatedat', // Mapt Sequelize's updatedAt auf updatedat in der DB
     }
   );
+
   return User;
 };

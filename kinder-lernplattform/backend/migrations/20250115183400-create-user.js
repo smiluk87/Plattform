@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       username: {
         type: Sequelize.STRING,
@@ -16,25 +16,25 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true, // Email sollte einzigartig sein
       },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      createdat: { // kleinbuchstaben 
+      createdat: { // Kleinbuchstaben
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'createdat'
+        field: 'createdat', // Mappt auf das korrekte Feld in der Datenbank
       },
-      updatedAt: { //kleinbuchstaben
+      updatedat: { // Kleinbuchstaben
         allowNull: false,
         type: Sequelize.DATE,
-        field: 'updatedat'
-      }
-      
+        field: 'updatedat', // Mappt auf das korrekte Feld in der Datenbank
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('users');
-  }
+  },
 };
