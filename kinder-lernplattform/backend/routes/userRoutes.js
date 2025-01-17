@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { generateToken } = require('../controllers/authController');
+const jwt = require('jsonwebtoken');
 const verifyToken = require('../middlewares/authMiddleware');
 const db = require('../models');
 
-// Benutzer-Routen
+// Token-Generierung
+const generateToken = (payload) => {
+  const secret = process.env.JWT_SECRET || 'your_secret_key';
+  return jwt.sign(payload, secret, { expiresIn: '1h' });
+};
+
+// Benutzer erstellen
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -15,6 +21,7 @@ router.post('/users', async (req, res) => {
   }
 });
 
+// Alle Benutzer abrufen
 router.get('/users', async (req, res) => {
   try {
     const users = await db.User.findAll();
@@ -62,7 +69,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Profil
+// Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id);
@@ -77,6 +84,7 @@ router.get('/profile', verifyToken, async (req, res) => {
   }
 });
 
+// Profil aktualisieren
 router.put('/profile', verifyToken, async (req, res) => {
   const { username, email } = req.body;
 
@@ -102,20 +110,18 @@ router.get('/dashboard', verifyToken, (req, res) => {
   res.json({ message: `Willkommen auf dem Dashboard, ${req.user.username}!` });
 });
 
-// Quizfragen
-const quizData = {
-  math: [
-    { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
-    { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
-    { question: 'Was ist 35 - 17?', options: ['19', '18', '22'], answer: '18' },
-  ],
-  english: [
-    { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
-    { question: "Which article fits: '___ apple'?", options: ['A', 'An', 'The'], answer: 'An' },
-  ],
-};
-
+// Quizfragen abrufen
 router.get('/quiz/:subject', verifyToken, (req, res) => {
+  const quizData = {
+    math: [
+      { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
+      { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
+    ],
+    english: [
+      { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
+    ],
+  };
+
   const subject = req.params.subject;
   const questions = quizData[subject];
   if (!questions) {
@@ -129,7 +135,7 @@ router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
 
   if (!category || score === undefined) {
-    return res.status(400).json({ message: 'Kategorie und Punkte sind erforderlich!' });
+    return res.status(400).json({ message: 'Kategorie und Score sind erforderlich!' });
   }
 
   try {
@@ -149,22 +155,37 @@ router.post('/progress', verifyToken, async (req, res) => {
 // Fortschritt abrufen
 router.get('/progress', verifyToken, async (req, res) => {
   try {
-    const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
+    const progresses = await db.Progress.findAll({ where: { userid: req.user.id } });
 
-    const totalScores = progress.reduce((sum, entry) => sum + entry.score, 0);
-    const averageScore = progress.length ? (totalScores / progress.length).toFixed(2) : 0;
-    const highestScore = progress.reduce((max, entry) => (entry.score > max ? entry.score : max), 0);
+    const totalScores = progresses.reduce((sum, entry) => sum + entry.score, 0);
+    const statistics = {
+      averageScore: progresses.length ? (totalScores / progresses.length).toFixed(2) : 0,
+      highestScore: Math.max(...progresses.map((p) => p.score), 0),
+      attempts: progresses.length,
+    };
 
-    res.json({
-      progress,
-      statistics: {
-        averageScore,
-        highestScore,
-        attempts: progress.length,
-      },
-    });
+    res.json({ progresses, statistics });
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!', error: error.message });
+  }
+});
+
+// Leaderboard
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const leaderboard = await db.Progress.findAll({
+      attributes: [
+        'userid',
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
+      ],
+      group: ['userid'],
+      include: [{ model: db.User, attributes: ['username'] }],
+      order: [[db.Sequelize.literal('totalScore'), 'DESC']],
+    });
+
+    res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!', error: error.message });
   }
 });
 

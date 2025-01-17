@@ -19,15 +19,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'users',
+          model: 'users', // muss mit dem Tabellennamen der Users-Tabelle übereinstimmen
           key: 'id',
         },
       },
     },
     {
       tableName: 'progresses',
-      underscored: true,
-      createdAt: 'createdat', // Mapping für Datenbank
+      underscored: true, // für Snake-Case in der DB
+      timestamps: true, // Aktiviert createdAt und updatedAt
+      createdAt: 'createdat', // Mapping der Felder
       updatedAt: 'updatedat',
     }
   );
@@ -35,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
   Progress.associate = (models) => {
     Progress.belongsTo(models.User, {
       foreignKey: 'userid',
-      onDelete: 'CASCADE',
+      onDelete: 'CASCADE', // Fortschritte eines Benutzers werden bei Löschung des Benutzers entfernt
     });
   };
 
