@@ -177,13 +177,14 @@ router.get('/leaderboard', async (req, res) => {
       include: [{ model: db.User, attributes: ['username'] }],
       order: [[db.Sequelize.literal('totalScore'), 'DESC']],
     });
-
+    console.log('Leaderboard:', leaderboard); // Debugging
     res.json(leaderboard);
   } catch (error) {
-    console.error("Fehler bei der Rangliste:", error);
+    console.error('Fehler beim Abrufen der Rangliste:', error); // Fehlerprotokoll
     res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!', error: error.message });
   }
 });
+
 
 
 module.exports = router;
