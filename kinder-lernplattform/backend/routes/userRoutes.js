@@ -106,6 +106,7 @@ router.get('/dashboard', verifyToken, (req, res) => {
 
 // Quizfragen abrufen
 router.get('/quiz/:subject', verifyToken, (req, res) => {
+  const subject = req.params.subject;
   const quizData = {
     math: [
       { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
@@ -115,8 +116,6 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
       { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
     ],
   };
-
-  const subject = req.params.subject;
   const questions = quizData[subject];
   if (!questions) {
     return res.status(404).json({ message: 'Thema nicht gefunden!' });
@@ -124,10 +123,10 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
   res.json(questions);
 });
 
+
 // Fortschritt speichern
 router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
-
   if (!category || score === undefined) {
     return res.status(400).json({ message: 'Kategorie und Score sind erforderlich!' });
   }
@@ -142,9 +141,11 @@ router.post('/progress', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress });
   } catch (error) {
+    console.error("Fehler beim Speichern des Fortschritts:", error);
     res.status(500).json({ message: 'Fehler beim Speichern des Fortschritts!', error: error.message });
   }
 });
+
 
 // Fortschritt abrufen
 router.get('/progress', verifyToken, async (req, res) => {
@@ -179,8 +180,10 @@ router.get('/leaderboard', async (req, res) => {
 
     res.json(leaderboard);
   } catch (error) {
+    console.error("Fehler bei der Rangliste:", error);
     res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!', error: error.message });
   }
 });
+
 
 module.exports = router;
