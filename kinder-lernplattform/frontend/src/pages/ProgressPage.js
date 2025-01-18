@@ -22,19 +22,19 @@ const ProgressPage = () => {
     const fetchProgress = async () => {
       const token = localStorage.getItem('authToken');
       try {
-        const response = await fetch('http://localhost:5000/users/progress', {
-          headers: { Authorization: `Bearer ${token}` }, // Token hinzufügen
+        const res = await fetch('http://localhost:5000/progress', {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await response.json();
-
-        if (response.ok) {
-          setProgressData(data.progress || []); // Fortschrittsdaten speichern
-          setStatistics(data.statistics || {}); // Statistiken speichern
-        } else {
-          setError(data.message || 'Fehler beim Abrufen der Fortschrittsdaten.');
+    
+        if (!res.ok) {
+          throw new Error('Fehler beim Abrufen der Fortschrittsdaten.');
         }
+    
+        const data = await res.json();
+        setProgressData(data.progresses || []);
+        setStatistics(data.statistics || {});
       } catch (err) {
-        setError('Fehler beim Abrufen der Fortschrittsdaten.');
+        setError(err.message);
       }
     };
 

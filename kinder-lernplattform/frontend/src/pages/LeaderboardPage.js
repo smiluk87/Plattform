@@ -14,17 +14,21 @@ const LeaderboardPage = () => {
   const fetchLeaderboard = useCallback(async () => {
     const token = localStorage.getItem('authToken');
     try {
-      const url = `http://localhost:5000/leaderboard?category=${category}&page=${page}&limit=5&search=${search}`;
-      const res = await axios.get(url, {
+      const res = await fetch('http://localhost:5000/leaderboard', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      setLeaderboard(res.data.leaderboard || []);
-      setTotalPages(res.data.totalPages || 1);
+      if (!res.ok) {
+        throw new Error('Fehler beim Abrufen der Rangliste.');
+      }
+  
+      const data = await res.json();
+      setLeaderboard(data.leaderboard || []);
     } catch (err) {
-      setError(err.response?.data?.message || 'Fehler beim Abrufen der Rangliste.');
+      setError(err.message);
     }
-  }, [category, page, search]);
+  }, []);
+  
   
 
   useEffect(() => {

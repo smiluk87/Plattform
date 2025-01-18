@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { generateToken } = require('../controllers/authController');
+const jwt = require('jsonwebtoken'); // Für Token-Generierung
 const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
@@ -45,10 +45,6 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email und Passwort sind erforderlich!' });
-  }
-
   try {
     const user = await db.User.findOne({ where: { email } });
 
@@ -56,7 +52,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
-    const token = generateToken({ id: user.id, username: user.username });
+    const token = jwt.sign({ id: user.id, username: user.username }, 'geheimesToken', { expiresIn: '1h' });
     res.json({ token, message: 'Erfolgreich angemeldet!' });
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Login!', error: error.message });
@@ -149,7 +145,6 @@ router.post('/progress', verifyToken, async (req, res) => {
 router.get('/progress', verifyToken, async (req, res) => {
   try {
     const progresses = await db.Progress.findAll({ where: { userid: req.user.id } });
-
     const totalScores = progresses.reduce((sum, entry) => sum + entry.score, 0);
     const statistics = {
       averageScore: progresses.length ? (totalScores / progresses.length).toFixed(2) : 0,
@@ -157,17 +152,14 @@ router.get('/progress', verifyToken, async (req, res) => {
       attempts: progresses.length,
     };
 
-    res.json({ progress: progresses, statistics });
+    res.json({ progresses, statistics });
   } catch (error) {
     console.error('Fehler beim Abrufen des Fortschritts:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
   }
 });
 
-
-
 // Rangliste abrufen
-// Leaderboard Endpoint
 router.get('/leaderboard', verifyToken, async (req, res) => {
   try {
     const results = await db.Progress.findAll({
@@ -178,26 +170,24 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
       include: [
         {
           model: db.User,
-          attributes: ['id', 'username']
+          attributes: ['username']
         }
       ],
       group: ['userid', 'User.id', 'User.username'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']]
+      order: [[db.Sequelize.literal('totalScore'), 'DESC']]
     });
 
-    // Formatierung der Ergebnisse
     const formattedResults = results.map((result) => ({
       userId: result.userid,
       username: result.User.username,
       totalScore: result.dataValues.totalScore,
     }));
 
-    res.json({ leaderboard: formattedResults, totalPages: 1 }); // Hardcoded totalPages for now
+    res.json({ leaderboard: formattedResults });
   } catch (error) {
     console.error('Fehler beim Abrufen der Rangliste:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!' });
   }
 });
-
 
 module.exports = router;
