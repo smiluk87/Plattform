@@ -105,8 +105,24 @@ router.put('/profile', verifyToken, async (req, res) => {
 });
 
 // Dashboard
-router.get('/dashboard', verifyToken, (req, res) => {
-  res.json({ message: `Willkommen auf dem Dashboard, ${req.user.username}!` });
+router.get('/dashboard', verifyToken, async (req, res) => {
+  try {
+    // Benutzer anhand der ID aus dem Token finden
+    const user = await db.User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    // Daten an das Frontend zurücksenden
+    res.json({
+      username: user.username,
+      email: user.email,
+      // Weitere Benutzerdaten hier hinzufügen, falls notwendig
+    });
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Dashboards:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Dashboards!' });
+  }
 });
 
 // Quizfragen abrufen
