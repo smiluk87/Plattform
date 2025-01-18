@@ -42,6 +42,8 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
+const jwt = require('jsonwebtoken');
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -58,6 +60,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Fehler beim Login!', error: error.message });
   }
 });
+
 
 // Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
@@ -145,6 +148,7 @@ router.post('/progress', verifyToken, async (req, res) => {
 router.get('/progress', verifyToken, async (req, res) => {
   try {
     const progresses = await db.Progress.findAll({ where: { userid: req.user.id } });
+
     const totalScores = progresses.reduce((sum, entry) => sum + entry.score, 0);
     const statistics = {
       averageScore: progresses.length ? (totalScores / progresses.length).toFixed(2) : 0,
@@ -174,7 +178,7 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
         }
       ],
       group: ['userid', 'User.id', 'User.username'],
-      order: [[db.Sequelize.literal('totalScore'), 'DESC']]
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']]
     });
 
     const formattedResults = results.map((result) => ({

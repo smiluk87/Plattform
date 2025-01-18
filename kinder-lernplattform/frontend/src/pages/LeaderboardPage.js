@@ -30,6 +30,7 @@ const LeaderboardPage = () => {
   }, []);
   
   
+  
 
   useEffect(() => {
     fetchLeaderboard();

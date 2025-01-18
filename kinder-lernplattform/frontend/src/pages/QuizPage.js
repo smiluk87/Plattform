@@ -11,13 +11,18 @@ const QuizPage = () => {
   // Fragen basierend auf Kategorie laden
   useEffect(() => {
     const fetchQuestions = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken'); // Korrekte Token-Nutzung
       try {
-        const res = await fetch(`http://localhost:5000/users/quiz/${category}`, {
+        const res = await fetch(`http://localhost:5000/quiz/${category}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        if (!res.ok) {
+          throw new Error('Fehler beim Abrufen der Quizfragen.');
+        }
+
         const data = await res.json();
-        console.log('Quiz-Daten:', data); // Debugging: Daten anzeigen
+        console.log('Quiz-Daten:', data); // Debugging
         setQuestions(data);
         setCurrentQuestionIndex(0); // Index zurücksetzen
         setScore(0); // Punktestand zurücksetzen
@@ -27,7 +32,6 @@ const QuizPage = () => {
         setMessage('Fehler beim Laden der Quizfragen.');
       }
     };
-    
 
     fetchQuestions();
   }, [category]); // API-Aufruf bei Kategorieänderung
@@ -47,9 +51,9 @@ const QuizPage = () => {
   };
 
   const saveProgress = async (finalScore) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     try {
-      const res = await fetch('http://localhost:5000/users/progress', {
+      const res = await fetch('http://localhost:5000/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,8 +87,8 @@ const QuizPage = () => {
           <option value="english">Englisch</option>
         </select>
       </div>
-      <h2>{questions[currentQuestionIndex].question}</h2>
-      {questions[currentQuestionIndex].options.map((option, index) => (
+      <h2>{questions[currentQuestionIndex]?.question}</h2>
+      {questions[currentQuestionIndex]?.options.map((option, index) => (
         <div key={index}>
           <input
             type="radio"

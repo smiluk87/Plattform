@@ -6,24 +6,26 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/users/login', {
-        email,
-        password,
+      const res = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-      const token = response.data.token;
-      localStorage.setItem('token', token); // Token in localStorage speichern
-      setMessage(`Erfolgreich angemeldet: ${token}`);
-    } catch (error) {
-        if (error.response && error.response.status === 401) {
-          setMessage('Ungültige E-Mail oder Passwort.');
-        } else {
-          setMessage('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
-        }
+  
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('authToken', data.token); // Token speichern
+        navigate('/dashboard'); // Weiterleitung nach erfolgreichem Login
+      } else {
+        throw new Error(data.message || 'Fehler beim Login.');
       }
+    } catch (err) {
+      setError(err.message); // Fehlernachricht setzen
+    }
   };
+  
 
   return (
     <div>
