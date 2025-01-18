@@ -20,9 +20,9 @@ const LoginPage = () => {
         const { token } = res.data;
         localStorage.setItem('authToken', token); // Token speichern
         setMessage('Login erfolgreich!');
-        navigate('/dashboard'); // Weiterleitung
+        navigate('/dashboard'); // Weiterleitung zum Dashboard nach erfolgreichem Login
       } else {
-        setMessage('Login fehlgeschlagen.');
+        setMessage('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Daten.');
       }
     } catch (err) {
       setMessage(err.response?.data?.message || 'Fehler beim Login.');
@@ -49,7 +49,7 @@ const LoginPage = () => {
         />
         <button type="submit">Login</button>
       </form>
-      {message && <p>{message}</p>}
+      {message && <p>{message}</p>} {/* Zeigt die Nachricht an */}
     </div>
   );
 };
