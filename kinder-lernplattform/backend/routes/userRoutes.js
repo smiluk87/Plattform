@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken'); // Für Token-Generierung
 const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
+
 // Benutzer erstellen
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
@@ -42,9 +44,12 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'E-Mail und Passwort sind erforderlich!' });
+  }
 
   try {
     const user = await db.User.findOne({ where: { email } });
@@ -53,13 +58,15 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
-    const token = jwt.sign({ id: user.id, username: user.username }, 'geheimesToken', { expiresIn: '1h' });
+    // Token sicher generieren
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+
+    // Antwort zurückgeben
     res.json({ token, message: 'Erfolgreich angemeldet!' });
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Login!', error: error.message });
   }
 });
-
 
 // Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
@@ -138,7 +145,7 @@ router.post('/progress', verifyToken, async (req, res) => {
 
     res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress });
   } catch (error) {
-    console.error("Fehler beim Speichern des Fortschritts:", error);
+    console.error('Fehler beim Speichern des Fortschritts:', error);
     res.status(500).json({ message: 'Fehler beim Speichern des Fortschritts!', error: error.message });
   }
 });
@@ -168,16 +175,16 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
     const results = await db.Progress.findAll({
       attributes: [
         'userid',
-        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore']
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
       ],
       include: [
         {
           model: db.User,
-          attributes: ['username']
-        }
+          attributes: ['username'],
+        },
       ],
       group: ['userid', 'User.id', 'User.username'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']]
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
     const formattedResults = results.map((result) => ({
