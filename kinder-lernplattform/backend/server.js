@@ -1,4 +1,4 @@
-require('dotenv').config(); // Umgebungsvariablen
+require('dotenv').config(); // Umgebungsvariablen laden
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -18,9 +18,11 @@ app.get('/', (req, res) => {
   res.send('Willkommen auf der Lernplattform!');
 });
 
-// Routen registrieren
-app.use('/api/users', userRoutes); // Alle Benutzer-, Fortschritts- und Quiz-Routen
-app.use('/api/auth', authRoutes); // Authentifizierungs-Routen
+// Authentifizierungsrouten registrieren (Login, Registrierung usw.)
+app.use('/auth', authRoutes); // Alle Routen sind unter '/auth/*' erreichbar, z. B. '/auth/login'
+
+// Benutzer-, Fortschritts- und Quizrouten registrieren
+app.use('/api/users', userRoutes); // Alle Routen sind unter '/api/users/*' erreichbar
 
 // Fehlerbehandlung für nicht gefundene Routen
 app.use((req, res, next) => {
@@ -31,4 +33,9 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server läuft auf Port ${PORT}`);
+  console.log('Verfügbare Endpunkte:');
+  console.log(`  - GET    /            (Willkommensnachricht)`);
+  console.log(`  - POST   /auth/login  (Login-Route)`);
+  console.log(`  - Weitere Auth-Routen sind unter /auth verfügbar`);
+  console.log(`  - Benutzer- und Quiz-Routen sind unter /api/users verfügbar`);
 });
