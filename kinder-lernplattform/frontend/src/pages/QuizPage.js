@@ -9,10 +9,10 @@ const QuizPage = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Für Ladezustand
 
-  // Fragen basierend auf Kategorie laden
+  // API-Aufruf, um Fragen basierend auf der Kategorie zu laden
   useEffect(() => {
     const fetchQuestions = async () => {
-      const token = localStorage.getItem('authToken'); // Korrekte Token-Nutzung
+      const token = localStorage.getItem('authToken');
       setLoading(true);
       setMessage(''); // Zurücksetzen von Nachrichten
       try {
@@ -26,41 +26,44 @@ const QuizPage = () => {
           } else {
             throw new Error('Fehler beim Abrufen der Quizfragen.');
           }
-          setQuestions([]); // Zurücksetzen, falls Fehler
+          setQuestions([]); // Zurücksetzen bei Fehler
           return;
         }
 
         const data = await res.json();
         setQuestions(data);
-        setCurrentQuestionIndex(0); // Index zurücksetzen
         setScore(0); // Punktestand zurücksetzen
         setSelectedOption(''); // Auswahl zurücksetzen
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Quizfragen:', error);
-        setMessage(error.message);
-        setQuestions([]); // Zurücksetzen, falls Fehler
+        setCurrentQuestionIndex(0); // Index zurücksetzen
+      } catch (err) {
+        setMessage(err.message);
+        setQuestions([]); // Zurücksetzen bei Fehler
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuestions();
-  }, [category]); // API-Aufruf bei Kategorieänderung
+  }, [category]); // Aktualisieren, wenn die Kategorie geändert wird
 
-  const handleSubmitAnswer = () => {
-    if (selectedOption === questions[currentQuestionIndex]?.answer) {
-      setScore(score + 1);
+  // Antwort absenden und Fortschritt berechnen
+  const handleSubmitAnswer = async () => {
+    const currentQuestion = questions[currentQuestionIndex];
+    if (selectedOption === currentQuestion.answer) {
+      setScore(score + 1); // Punktestand aktualisieren
     }
 
     if (currentQuestionIndex + 1 < questions.length) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption('');
+      setCurrentQuestionIndex(currentQuestionIndex + 1); // Zur nächsten Frage wechseln
+      setSelectedOption(''); // Auswahl zurücksetzen
     } else {
-      setMessage(`Quiz beendet! Dein Punktestand: ${score + 1}`);
-      saveProgress(score + 1);
+      const finalScore = score + (selectedOption === currentQuestion.answer ? 1 : 0);
+      setMessage(`Quiz abgeschlossen! Dein Punktestand: ${finalScore}`);
+      await saveProgress(finalScore); // Fortschritt speichern
     }
   };
 
+  // Fortschritt speichern
   const saveProgress = async (finalScore) => {
     const token = localStorage.getItem('authToken');
     try {
@@ -72,12 +75,13 @@ const QuizPage = () => {
         },
         body: JSON.stringify({ category, score: finalScore }),
       });
+
       if (res.ok) {
         const data = await res.json();
         alert(`Fortschritt gespeichert: ${data.message}`);
       }
-    } catch (error) {
-      console.error('Fehler beim Speichern des Fortschritts:', error);
+    } catch (err) {
+      console.error('Fehler beim Speichern des Fortschritts:', err);
     }
   };
 
@@ -114,6 +118,7 @@ const QuizPage = () => {
       <button onClick={handleSubmitAnswer} disabled={!selectedOption}>
         Antwort abschicken
       </button>
+      <p>Aktueller Punktestand: {score}</p>
     </div>
   );
 };

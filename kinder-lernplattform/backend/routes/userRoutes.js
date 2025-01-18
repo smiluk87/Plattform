@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken'); // Für Token-Generierung
+const jwt = require('jsonwebtoken');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
