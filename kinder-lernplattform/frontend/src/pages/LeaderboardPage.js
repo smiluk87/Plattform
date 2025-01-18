@@ -18,13 +18,14 @@ const LeaderboardPage = () => {
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       setLeaderboard(res.data.leaderboard || []);
       setTotalPages(res.data.totalPages || 1);
     } catch (err) {
-      setError('Fehler beim Abrufen der Rangliste.');
+      setError(err.response?.data?.message || 'Fehler beim Abrufen der Rangliste.');
     }
   }, [category, page, search]);
+  
 
   useEffect(() => {
     fetchLeaderboard();

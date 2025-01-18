@@ -153,19 +153,22 @@ router.get('/progress', verifyToken, async (req, res) => {
     const totalScores = progresses.reduce((sum, entry) => sum + entry.score, 0);
     const statistics = {
       averageScore: progresses.length ? (totalScores / progresses.length).toFixed(2) : 0,
-      highestScore: Math.max(...progresses.map((p) => p.score), 0),
+      highestScore: progresses.length ? Math.max(...progresses.map((p) => p.score)) : 0,
       attempts: progresses.length,
     };
 
-    res.json({ progresses, statistics });
+    res.json({ progress: progresses, statistics });
   } catch (error) {
-    res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!', error: error.message });
+    console.error('Fehler beim Abrufen des Fortschritts:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
   }
 });
 
 
+
 // Rangliste abrufen
-router.get('/leaderboard', async (req, res) => {
+// Leaderboard Endpoint
+router.get('/leaderboard', verifyToken, async (req, res) => {
   try {
     const results = await db.Progress.findAll({
       attributes: [
@@ -181,11 +184,20 @@ router.get('/leaderboard', async (req, res) => {
       group: ['userid', 'User.id', 'User.username'],
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']]
     });
-    res.json(results);
+
+    // Formatierung der Ergebnisse
+    const formattedResults = results.map((result) => ({
+      userId: result.userid,
+      username: result.User.username,
+      totalScore: result.dataValues.totalScore,
+    }));
+
+    res.json({ leaderboard: formattedResults, totalPages: 1 }); // Hardcoded totalPages for now
   } catch (error) {
     console.error('Fehler beim Abrufen der Rangliste:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!', error: error.message });
+    res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!' });
   }
 });
+
 
 module.exports = router;
