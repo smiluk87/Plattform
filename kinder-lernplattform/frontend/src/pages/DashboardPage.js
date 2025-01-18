@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { useNavigate } from 'react-router-dom';
+
+// Chart.js-Module registrieren
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const DashboardPage = () => {
   const [username, setUsername] = useState(''); // Benutzername speichern
@@ -58,6 +63,23 @@ const DashboardPage = () => {
     navigate('/login'); // Zur Login-Seite weiterleiten
   };
 
+  // Daten für das Diagramm vorbereiten
+  const categories = progress.map((entry) => entry.category); // Kategorien (z. B. "Mathe")
+  const scores = progress.map((entry) => entry.score); // Punkte pro Kategorie
+
+  const chartData = {
+    labels: categories,
+    datasets: [
+      {
+        label: 'Punkte',
+        data: scores,
+        backgroundColor: 'rgba(75, 192, 192, 0.6)', // Balkenfarbe
+        borderColor: 'rgba(75, 192, 192, 1)', // Rahmenfarbe
+        borderWidth: 1, // Rahmenbreite
+      },
+    ],
+  };
+
   return (
     <div>
       <h1>Dashboard</h1>
@@ -81,13 +103,30 @@ const DashboardPage = () => {
       ) : progress.length > 0 ? (
         <>
           <h2>Ihr Fortschritt</h2>
-          <ul>
-            {progress.map((entry, index) => (
-              <li key={index}>
-                <strong>{entry.category}:</strong> {entry.score} Punkte
-              </li>
-            ))}
-          </ul>
+          <Bar
+            data={chartData}
+            options={{
+              responsive: true, // Responsive Design
+              plugins: {
+                legend: {
+                  position: 'top', // Position der Legende
+                },
+                title: {
+                  display: true,
+                  text: 'Fortschrittsübersicht', // Titel des Diagramms
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true, // Y-Achse beginnt bei 0
+                  title: {
+                    display: true,
+                    text: 'Punkte', // Beschriftung der Y-Achse
+                  },
+                },
+              },
+            }}
+          />
         </>
       ) : (
         <p>Bisher keine Fortschrittsdaten vorhanden. Starten Sie ein Quiz, um Fortschritte zu machen!</p> // Nachricht bei fehlenden Fortschrittsdaten
