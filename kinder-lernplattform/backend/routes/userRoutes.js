@@ -163,6 +163,7 @@ router.get('/progress', verifyToken, async (req, res) => {
   }
 });
 
+
 // Rangliste abrufen
 router.get('/leaderboard', async (req, res) => {
   try {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import UserStatistics from '../components/UserStatistics';
+import axios from 'axios';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -11,22 +12,17 @@ const LeaderboardPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchLeaderboard = useCallback(async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     try {
-      const url = `http://localhost:5000/users/leaderboard${category ? `/${category}` : ''}?page=${page}&limit=5&search=${search}`;
-      const res = await fetch(url, {
+      const url = `http://localhost:5000/leaderboard?category=${category}&page=${page}&limit=5&search=${search}`;
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) {
-        throw new Error('Fehler beim Abrufen der Rangliste.');
-      }
-
-      const data = await res.json();
-      setLeaderboard(data.leaderboard);
-      setTotalPages(data.totalPages);
+      setLeaderboard(res.data.leaderboard || []);
+      setTotalPages(res.data.totalPages || 1);
     } catch (err) {
-      setError(err.message);
+      setError('Fehler beim Abrufen der Rangliste.');
     }
   }, [category, page, search]);
 
@@ -95,8 +91,8 @@ const LeaderboardPage = () => {
           {leaderboard.length > 0 ? (
             leaderboard.map((user, index) => (
               <tr
-                key={user.userId}
-                onClick={() => openUserStatistics(user.userId)}
+                key={user.userid}
+                onClick={() => openUserStatistics(user.userid)}
                 style={{
                   backgroundColor:
                     user.reward === 'Gold'
@@ -110,7 +106,7 @@ const LeaderboardPage = () => {
                 }}
               >
                 <td>{index + 1 + (page - 1) * 5}</td>
-                <td>{user.username}</td>
+                <td>{user.User.username}</td>
                 <td>{user.totalScore}</td>
                 <td>{user.reward || '—'}</td>
               </tr>

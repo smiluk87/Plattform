@@ -10,24 +10,28 @@ import {
   Legend,
 } from 'chart.js';
 
-// Registriere die Module in Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ProgressPage = () => {
-  const [progress, setProgress] = useState([]);
-  const [statistics, setStatistics] = useState({}); // Statistiken speichern
+  const [progressData, setProgressData] = useState([]);
+  const [statistics, setStatistics] = useState({});
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchProgress = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       try {
-        const res = await fetch('http://localhost:5000/users/progress', {
+        const response = await fetch('http://localhost:5000/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        setProgress(data.progress);
-        setStatistics(data.statistics); // Statistiken vom Backend übernehmen
+        const data = await response.json();
+
+        if (data.progresses) {
+          setProgressData(data.progresses);
+          setStatistics(data.statistics || {});
+        } else {
+          setError('Ungültige Daten vom Server.');
+        }
       } catch (err) {
         setError('Fehler beim Abrufen der Fortschrittsdaten.');
       }
@@ -36,9 +40,8 @@ const ProgressPage = () => {
     fetchProgress();
   }, []);
 
-  // Daten für das Diagramm vorbereiten
-  const categories = progress.map((entry) => entry.category);
-  const scores = progress.map((entry) => entry.score);
+  const categories = progressData.map((entry) => entry.category);
+  const scores = progressData.map((entry) => entry.score);
 
   const chartData = {
     labels: categories,
@@ -56,14 +59,14 @@ const ProgressPage = () => {
   return (
     <div>
       <h1>Fortschritt</h1>
-      {error && <p>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <div>
         <h3>Statistiken:</h3>
         <p><strong>Durchschnittlicher Score:</strong> {statistics.averageScore}</p>
         <p><strong>Höchster Score:</strong> {statistics.highestScore}</p>
         <p><strong>Anzahl der Versuche:</strong> {statistics.attempts}</p>
       </div>
-      {progress.length > 0 ? (
+      {progressData.length > 0 ? (
         <>
           <Bar
             data={chartData}
@@ -89,7 +92,7 @@ const ProgressPage = () => {
               </tr>
             </thead>
             <tbody>
-              {progress.map((entry, index) => (
+              {progressData.map((entry, index) => (
                 <tr key={index}>
                   <td>{entry.category}</td>
                   <td>{entry.score}</td>
