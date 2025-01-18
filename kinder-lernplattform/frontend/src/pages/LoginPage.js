@@ -1,31 +1,33 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import für Navigation
 import axios from 'axios';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // React-Router-Hook für Navigation
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Standard-Formularverhalten verhindern
     try {
-      const res = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const res = await axios.post('http://localhost:5000/login', {
+        email,
+        password,
       });
-  
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('authToken', data.token); // Token speichern
-        navigate('/dashboard'); // Weiterleitung nach erfolgreichem Login
+
+      if (res.status === 200) {
+        const { token } = res.data;
+        localStorage.setItem('authToken', token); // Token speichern
+        setMessage('Login erfolgreich!');
+        navigate('/dashboard'); // Weiterleitung
       } else {
-        throw new Error(data.message || 'Fehler beim Login.');
+        setMessage('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Daten.');
       }
     } catch (err) {
-      setError(err.message); // Fehlernachricht setzen
+      setMessage(err.response?.data?.message || 'Ein Fehler ist aufgetreten.');
     }
   };
-  
 
   return (
     <div>
