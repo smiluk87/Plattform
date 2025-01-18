@@ -19,12 +19,13 @@ if (config.use_env_variable) {
   });
 }
 
-// Verbindungsüberprüfung hinzufügen
+// Verbindungsüberprüfung
 sequelize
   .authenticate()
   .then(() => console.log('Datenbank verbunden!'))
   .catch((err) => console.error('Fehler bei der Verbindung:', err));
 
+// Modelle laden
 fs
   .readdirSync(__dirname)
   .filter(file => {
@@ -40,12 +41,14 @@ fs
     db[model.name] = model;
   });
 
+// Modelle assoziieren (falls benötigt)
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
 
+// Export für Sequelize und Modelle
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
