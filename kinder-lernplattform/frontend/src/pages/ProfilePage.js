@@ -9,7 +9,12 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('authToken'); // Verwendung von 'authToken'
+      const token = localStorage.getItem('authToken'); // Token aus dem LocalStorage abrufen
+      if (!token) {
+        setError('Authentifizierung fehlgeschlagen. Bitte melden Sie sich an.');
+        return;
+      }
+
       setLoading(true);
       try {
         const res = await fetch('http://localhost:5000/users/profile', {
@@ -17,7 +22,10 @@ const ProfilePage = () => {
         });
 
         if (!res.ok) {
-          throw new Error('Fehler beim Abrufen des Profils');
+          if (res.status === 401) {
+            throw new Error('Nicht autorisiert. Bitte melden Sie sich erneut an.');
+          }
+          throw new Error('Fehler beim Abrufen des Profils.');
         }
 
         const data = await res.json();
@@ -34,7 +42,12 @@ const ProfilePage = () => {
   }, []);
 
   const handleSave = async () => {
-    const token = localStorage.getItem('authToken'); // Verwendung von 'authToken'
+    const token = localStorage.getItem('authToken'); // Token abrufen
+    if (!token) {
+      setError('Authentifizierung fehlgeschlagen. Bitte melden Sie sich an.');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('http://localhost:5000/users/profile', {
@@ -47,11 +60,14 @@ const ProfilePage = () => {
       });
 
       if (!res.ok) {
-        throw new Error('Fehler beim Speichern des Profils');
+        if (res.status === 401) {
+          throw new Error('Nicht autorisiert. Bitte melden Sie sich erneut an.');
+        }
+        throw new Error('Fehler beim Speichern des Profils.');
       }
 
       const data = await res.json();
-      setMessage(data.message);
+      setMessage(data.message); // Erfolgsnachricht anzeigen
       setError('');
       setEditMode(false);
     } catch (err) {
@@ -81,7 +97,7 @@ const ProfilePage = () => {
             name="username"
             value={userData.username}
             onChange={handleChange}
-            disabled={!editMode}
+            disabled={!editMode || loading}
             style={{
               width: '100%',
               padding: '0.5rem',
@@ -97,7 +113,7 @@ const ProfilePage = () => {
             name="email"
             value={userData.email}
             onChange={handleChange}
-            disabled={!editMode}
+            disabled={!editMode || loading}
             style={{
               width: '100%',
               padding: '0.5rem',
@@ -110,16 +126,17 @@ const ProfilePage = () => {
           <button
             type="button"
             onClick={handleSave}
+            disabled={loading} // Button während des Ladens deaktivieren
             style={{
               padding: '0.5rem 1rem',
               backgroundColor: '#007BFF',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
           >
-            Speichern
+            {loading ? 'Speichern...' : 'Speichern'}
           </button>
         ) : (
           <button
