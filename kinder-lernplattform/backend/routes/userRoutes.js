@@ -77,6 +77,8 @@ router.get('/dashboard', verifyToken, async (req, res) => {
 // Quizfragen abrufen
 router.get('/quiz/:subject', verifyToken, (req, res) => {
   const subject = req.params.subject;
+
+  console.log('Quiz-Anfrage empfangen für Fach:', subject); // Debugging-Log
   const quizData = {
     math: [
       { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
@@ -84,12 +86,16 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
     ],
     english: [
       { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
+      { question: "What is the opposite of 'happy'?", options: ['outraged', 'sad', 'overwhelmed'], answer: 'sad' },
     ],
   };
+
   const questions = quizData[subject];
   if (!questions) {
+    console.error('Keine Fragen für das Thema gefunden:', subject); // Debugging-Log
     return res.status(404).json({ message: 'Thema nicht gefunden!' });
   }
+
   res.json(questions);
 });
 

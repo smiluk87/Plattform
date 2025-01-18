@@ -13,6 +13,8 @@ const QuizPage = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('authToken');
+      console.log('Token für Quiz-Anfrage:', token); // Debugging
+      console.log('Kategorie für Quiz-Anfrage:', category); // Debugging
       setLoading(true);
       setMessage(''); // Zurücksetzen von Nachrichten
       try {
@@ -31,12 +33,14 @@ const QuizPage = () => {
         }
 
         const data = await res.json();
+        console.log('Quiz-Daten:', data); // Debugging
         setQuestions(data);
         setScore(0); // Punktestand zurücksetzen
         setSelectedOption(''); // Auswahl zurücksetzen
         setCurrentQuestionIndex(0); // Index zurücksetzen
       } catch (err) {
-        setMessage(err.message);
+        console.error('Fehler beim Abrufen der Quizfragen:', err); // Debugging
+        setMessage('Fehler beim Laden der Quizfragen.');
         setQuestions([]); // Zurücksetzen bei Fehler
       } finally {
         setLoading(false);
@@ -66,6 +70,7 @@ const QuizPage = () => {
   // Fortschritt speichern
   const saveProgress = async (finalScore) => {
     const token = localStorage.getItem('authToken');
+    console.log('Fortschritt speichern. Token:', token); // Debugging
     try {
       const res = await fetch('http://localhost:5000/progress', {
         method: 'POST',
@@ -79,9 +84,11 @@ const QuizPage = () => {
       if (res.ok) {
         const data = await res.json();
         alert(`Fortschritt gespeichert: ${data.message}`);
+      } else {
+        console.error('Fehler beim Speichern des Fortschritts:', res.statusText);
       }
     } catch (err) {
-      console.error('Fehler beim Speichern des Fortschritts:', err);
+      console.error('Fehler beim Speichern des Fortschritts:', err); // Debugging
     }
   };
 
