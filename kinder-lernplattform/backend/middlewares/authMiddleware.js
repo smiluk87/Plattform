@@ -3,15 +3,17 @@ const db = require('../models'); // Import des Datenbankmodells
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
 const verifyToken = async (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Token aus dem Authorization-Header extrahieren
+
   if (!token) {
-    return res.status(403).json({ message: 'Kein Token bereitgestellt!' });
+    return res.status(401).json({ message: 'Token fehlt!' }); // Konsistente Fehlermeldung
   }
 
   try {
     // Token validieren und Benutzerinformationen extrahieren
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // Benutzerinformationen aus dem Token speichern
 
     // Benutzer in der Datenbank überprüfen
     const user = await db.User.findByPk(decoded.id);
@@ -21,16 +23,16 @@ const verifyToken = async (req, res, next) => {
 
     next(); // Weiter zur nächsten Middleware
   } catch (error) {
-    // Spezifische Fehlerbehandlung
+    // Fehlerhandling basierend auf dem Fehler des JWT
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ message: 'Ungültiges Token!' });
+      return res.status(403).json({ message: 'Ungültiges Token!' });
     }
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Token abgelaufen!' });
     }
 
     console.error('Fehler bei der Token-Überprüfung:', error);
-    return res.status(500).json({ message: 'Ein Fehler ist aufgetreten!' });
+    return res.status(500).json({ message: 'Ein interner Fehler ist aufgetreten!' });
   }
 };
 

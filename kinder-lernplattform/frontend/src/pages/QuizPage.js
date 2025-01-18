@@ -10,45 +10,48 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(false); // Für Ladezustand
 
   // API-Aufruf, um Fragen basierend auf der Kategorie zu laden
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      const token = localStorage.getItem('authToken');
-      console.log('Token für Quiz-Anfrage:', token); // Debugging
-      console.log('Kategorie für Quiz-Anfrage:', category); // Debugging
-      setLoading(true);
-      setMessage(''); // Zurücksetzen von Nachrichten
-      try {
-        const res = await fetch(`http://localhost:5000/quiz/${category}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  const fetchQuestions = async (subject) => {
+    const token = localStorage.getItem('authToken');
+    console.log('Token für Quiz-Anfrage:', token); // Debugging
+    console.log('Kategorie für Quiz-Anfrage:', subject); // Debugging
+    setLoading(true);
+    setMessage(''); // Zurücksetzen von Nachrichten
+    try {
+      const res = await fetch(`http://localhost:5000/api/users/quiz/${subject}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (!res.ok) {
-          if (res.status === 404) {
-            setMessage('Keine Fragen in dieser Kategorie gefunden.');
-          } else {
-            throw new Error('Fehler beim Abrufen der Quizfragen.');
-          }
-          setQuestions([]); // Zurücksetzen bei Fehler
-          return;
+      if (!res.ok) {
+        if (res.status === 404) {
+          setMessage('Keine Fragen in dieser Kategorie gefunden.');
+        } else {
+          throw new Error('Fehler beim Abrufen der Quizfragen.');
         }
-
-        const data = await res.json();
-        console.log('Quiz-Daten:', data); // Debugging
-        setQuestions(data);
-        setScore(0); // Punktestand zurücksetzen
-        setSelectedOption(''); // Auswahl zurücksetzen
-        setCurrentQuestionIndex(0); // Index zurücksetzen
-      } catch (err) {
-        console.error('Fehler beim Abrufen der Quizfragen:', err); // Debugging
-        setMessage('Fehler beim Laden der Quizfragen.');
         setQuestions([]); // Zurücksetzen bei Fehler
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
-    fetchQuestions();
-  }, [category]); // Aktualisieren, wenn die Kategorie geändert wird
+      const data = await res.json();
+      console.log('Quiz-Daten:', data); // Debugging
+      setQuestions(data);
+      setScore(0); // Punktestand zurücksetzen
+      setSelectedOption(''); // Auswahl zurücksetzen
+      setCurrentQuestionIndex(0); // Index zurücksetzen
+    } catch (err) {
+      console.error('Fehler beim Abrufen der Quizfragen:', err); // Debugging
+      setMessage('Fehler beim Laden der Quizfragen.');
+      setQuestions([]); // Zurücksetzen bei Fehler
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions(category); // Laden der Fragen bei Änderung der Kategorie
+  }, [category]);
 
   // Antwort absenden und Fortschritt berechnen
   const handleSubmitAnswer = async () => {
@@ -72,7 +75,7 @@ const QuizPage = () => {
     const token = localStorage.getItem('authToken');
     console.log('Fortschritt speichern. Token:', token); // Debugging
     try {
-      const res = await fetch('http://localhost:5000/progress', {
+      const res = await fetch('http://localhost:5000/api/users/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
