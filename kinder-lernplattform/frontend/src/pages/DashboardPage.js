@@ -5,7 +5,6 @@ const DashboardPage = () => {
   const [progress, setProgress] = useState([]); // Fortschrittsdaten speichern
   const [error, setError] = useState(''); // Fehlernachricht speichern
 
-  // useEffect zum Abrufen der Benutzerdaten und Fortschrittsdaten
   useEffect(() => {
     const fetchDashboardData = async () => {
       const token = localStorage.getItem('authToken'); // Token aus LocalStorage holen
@@ -26,7 +25,7 @@ const DashboardPage = () => {
         }
 
         const userData = await userRes.json();
-        setUsername(userData.username);
+        setUsername(userData.username); // Benutzername setzen
 
         // Fortschrittsdaten abrufen
         const progressRes = await fetch('http://localhost:5000/users/progress', {
@@ -34,11 +33,16 @@ const DashboardPage = () => {
         });
 
         if (!progressRes.ok) {
-          throw new Error('Fehler beim Abrufen der Fortschritts-Daten.');
+          // Wenn keine Fortschrittsdaten vorhanden sind, leeres Array setzen
+          if (progressRes.status === 404) {
+            setProgress([]);
+          } else {
+            throw new Error('Fehler beim Abrufen der Fortschritts-Daten.');
+          }
+        } else {
+          const progressData = await progressRes.json();
+          setProgress(progressData.progresses || []); // Fortschrittsdaten setzen oder leeres Array
         }
-
-        const progressData = await progressRes.json();
-        setProgress(progressData.progresses); // Fortschrittsdaten setzen
       } catch (err) {
         setError(err.message); // Fehler setzen
       }
@@ -50,24 +54,22 @@ const DashboardPage = () => {
   return (
     <div>
       <h1>Dashboard</h1>
+      <p>Willkommen auf dem Dashboard, {username}!</p> {/* Begrüßung unabhängig von Fehlern */}
       {error ? (
         <p style={{ color: 'red' }}>{error}</p> // Fehler anzeigen
-      ) : (
+      ) : progress.length > 0 ? (
         <>
-          <p>Willkommen auf dem Dashboard, {username}!</p> {/* Benutzername anzeigen */}
           <h2>Ihr Fortschritt</h2>
-          {progress.length > 0 ? (
-            <ul>
-              {progress.map((entry, index) => (
-                <li key={index}>
-                  <strong>{entry.category}:</strong> {entry.score} Punkte
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Keine Fortschrittsdaten verfügbar.</p>
-          )}
+          <ul>
+            {progress.map((entry, index) => (
+              <li key={index}>
+                <strong>{entry.category}:</strong> {entry.score} Punkte
+              </li>
+            ))}
+          </ul>
         </>
+      ) : (
+        <p>Bisher keine Fortschrittsdaten vorhanden. Starten Sie ein Quiz, um Fortschritte zu machen!</p> // Nachricht bei fehlenden Fortschrittsdaten
       )}
     </div>
   );
