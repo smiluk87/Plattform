@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
   const [username, setUsername] = useState(''); // Benutzername speichern
   const [progress, setProgress] = useState([]); // Fortschrittsdaten speichern
   const [error, setError] = useState(''); // Fehlernachricht speichern
+  const navigate = useNavigate(); // React-Router-Hook für Navigation
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -51,10 +53,29 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // Token entfernen
+    navigate('/login'); // Zur Login-Seite weiterleiten
+  };
+
   return (
     <div>
       <h1>Dashboard</h1>
       <p>Willkommen auf dem Dashboard, {username}!</p> {/* Begrüßung unabhängig von Fehlern */}
+      <button
+        onClick={handleLogout}
+        style={{
+          padding: '0.5rem 1rem',
+          backgroundColor: '#ff4d4f',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          marginBottom: '1rem',
+        }}
+      >
+        Logout
+      </button>
       {error ? (
         <p style={{ color: 'red' }}>{error}</p> // Fehler anzeigen
       ) : progress.length > 0 ? (
