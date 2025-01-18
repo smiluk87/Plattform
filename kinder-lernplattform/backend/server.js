@@ -1,17 +1,21 @@
-require('dotenv').config();
+require('dotenv').config(); // Umgebungsvariablen
 const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const bodyParser = require('body-parser');
+const app = express();
+
+// Routen importieren
 const userRoutes = require('./routes/userRoutes'); // Benutzer-Routen importieren
+const authRoutes = require('./routes/authRoutes'); // Auth-Routen importieren
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
-// Benutzer-Routen registrieren
-app.use('/users', userRoutes);
+// Routen registrieren
+app.use('/users', userRoutes); // Benutzer-Routen registrieren
+app.use('/', authRoutes); // Authentifizierungs-Routen registrieren
 
 // Beispiel-Route
 app.get('/', (req, res) => {

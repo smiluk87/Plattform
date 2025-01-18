@@ -22,10 +22,10 @@ const LoginPage = () => {
         setMessage('Login erfolgreich!');
         navigate('/dashboard'); // Weiterleitung
       } else {
-        setMessage('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Daten.');
+        setMessage('Login fehlgeschlagen.');
       }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Ein Fehler ist aufgetreten.');
+      setMessage(err.response?.data?.message || 'Fehler beim Login.');
     }
   };
 
