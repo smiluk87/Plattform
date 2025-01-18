@@ -59,6 +59,10 @@ router.post('/login', async (req, res) => {
 // Dashboard
 router.get('/dashboard', verifyToken, async (req, res) => {
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ message: 'Ungültiges Token oder Benutzer-ID fehlt!' });
+    }
+
     const user = await db.User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });

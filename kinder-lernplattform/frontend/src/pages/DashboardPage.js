@@ -18,12 +18,13 @@ const DashboardPage = () => {
 
       if (!token) {
         setError('Kein Token gefunden. Bitte melden Sie sich an.');
+        navigate('/login'); // Weiterleitung zur Login-Seite
         return;
       }
 
       try {
         // Benutzername abrufen
-        const userRes = await fetch('http://localhost:5000/users/dashboard', {
+        const userRes = await fetch('http://localhost:5000/api/users/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -35,20 +36,19 @@ const DashboardPage = () => {
         setUsername(userData.username); // Benutzername setzen
 
         // Fortschrittsdaten abrufen
-        const progressRes = await fetch('http://localhost:5000/users/progress', {
+        const progressRes = await fetch('http://localhost:5000/api/users/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!progressRes.ok) {
-          // Wenn keine Fortschrittsdaten vorhanden sind, leeres Array setzen
           if (progressRes.status === 404) {
-            setProgress([]);
+            setProgress([]); // Keine Fortschrittsdaten vorhanden
           } else {
             throw new Error('Fehler beim Abrufen der Fortschritts-Daten.');
           }
         } else {
           const progressData = await progressRes.json();
-          setProgress(progressData.progresses || []); // Fortschrittsdaten setzen oder leeres Array
+          setProgress(progressData || []); // Fortschrittsdaten setzen
         }
       } catch (err) {
         setError(err.message); // Fehler setzen
@@ -56,7 +56,7 @@ const DashboardPage = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken'); // Token entfernen
