@@ -14,6 +14,35 @@ function generateToken(user) {
   );
 }
 
+// Registrierung
+const register = async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // Passwort hashen
+    const hashedPassword = await bcrypt.hash(password, 10); // Passwort mit 10 Runden hashen
+
+    // Benutzer erstellen
+    const newUser = await db.User.create({
+      username,
+      email,
+      password: hashedPassword, // Gehashtes Passwort speichern
+    });
+
+    res.status(201).json({
+      message: 'Benutzer erfolgreich registriert!',
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
+  } catch (error) {
+    console.error('Fehler bei der Registrierung:', error);
+    res.status(500).json({ message: 'Fehler bei der Registrierung!' });
+  }
+};
+
 // Login-Route
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -47,4 +76,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { login };
+module.exports = { register, login };
