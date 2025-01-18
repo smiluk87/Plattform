@@ -7,29 +7,40 @@ const QuizPage = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [category, setCategory] = useState('math'); // Standardkategorie
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Für Ladezustand
 
   // Fragen basierend auf Kategorie laden
   useEffect(() => {
     const fetchQuestions = async () => {
       const token = localStorage.getItem('authToken'); // Korrekte Token-Nutzung
+      setLoading(true);
+      setMessage(''); // Zurücksetzen von Nachrichten
       try {
         const res = await fetch(`http://localhost:5000/quiz/${category}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
-          throw new Error('Fehler beim Abrufen der Quizfragen.');
+          if (res.status === 404) {
+            setMessage('Keine Fragen in dieser Kategorie gefunden.');
+          } else {
+            throw new Error('Fehler beim Abrufen der Quizfragen.');
+          }
+          setQuestions([]); // Zurücksetzen, falls Fehler
+          return;
         }
 
         const data = await res.json();
-        console.log('Quiz-Daten:', data); // Debugging
         setQuestions(data);
         setCurrentQuestionIndex(0); // Index zurücksetzen
         setScore(0); // Punktestand zurücksetzen
         setSelectedOption(''); // Auswahl zurücksetzen
       } catch (error) {
         console.error('Fehler beim Abrufen der Quizfragen:', error);
-        setMessage('Fehler beim Laden der Quizfragen.');
+        setMessage(error.message);
+        setQuestions([]); // Zurücksetzen, falls Fehler
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -37,7 +48,7 @@ const QuizPage = () => {
   }, [category]); // API-Aufruf bei Kategorieänderung
 
   const handleSubmitAnswer = () => {
-    if (selectedOption === questions[currentQuestionIndex].answer) {
+    if (selectedOption === questions[currentQuestionIndex]?.answer) {
       setScore(score + 1);
     }
 
@@ -64,17 +75,18 @@ const QuizPage = () => {
       if (res.ok) {
         const data = await res.json();
         alert(`Fortschritt gespeichert: ${data.message}`);
-        if (data.reward) {
-          alert(`Belohnung: ${data.reward}`);
-        }
       }
     } catch (error) {
       console.error('Fehler beim Speichern des Fortschritts:', error);
     }
   };
 
+  if (loading) {
+    return <p>Lade Fragen...</p>;
+  }
+
   if (questions.length === 0) {
-    return <p>{message || 'Lade Fragen...'}</p>;
+    return <p>{message || 'Keine Fragen gefunden.'}</p>;
   }
 
   return (
