@@ -22,22 +22,28 @@ const login = async (req, res) => {
     // Benutzer anhand der E-Mail-Adresse suchen
     const user = await db.User.findOne({ where: { email } });
 
+    // Benutzer nicht gefunden
     if (!user) {
-      return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
+      return res.status(401).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    // Passwort prüfen (bcrypt verwenden)
+    // Passwortprüfung
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
+      return res.status(401).json({ message: 'Falsches Passwort!' });
     }
 
     // Token generieren
     const token = generateToken(user);
-    res.json({ token, message: 'Erfolgreich angemeldet!' });
+
+    // Erfolgreiche Antwort
+    res.json({ 
+      token, 
+      message: 'Login erfolgreich!' 
+    });
   } catch (error) {
     console.error('Fehler beim Login:', error);
-    res.status(500).json({ message: 'Fehler beim Login!' });
+    res.status(500).json({ message: 'Interner Serverfehler!' });
   }
 };
 
