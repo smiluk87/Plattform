@@ -17,16 +17,6 @@ router.post('/users', async (req, res) => {
   }
 });
 
-// Alle Benutzer abrufen
-router.get('/users', async (req, res) => {
-  try {
-    const users = await db.User.findAll();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzer!', error: error.message });
-  }
-});
-
 // Registrierung
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
@@ -58,66 +48,25 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
-    // Token sicher generieren
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Antwort zurückgeben
     res.json({ token, message: 'Erfolgreich angemeldet!' });
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Login!', error: error.message });
   }
 });
 
-// Profil abrufen
-router.get('/profile', verifyToken, async (req, res) => {
-  try {
-    const user = await db.User.findByPk(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-    }
-
-    res.json({ username: user.username, email: user.email });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Profil aktualisieren
-router.put('/profile', verifyToken, async (req, res) => {
-  const { username, email } = req.body;
-
-  try {
-    const user = await db.User.findByPk(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-    }
-
-    user.username = username;
-    user.email = email;
-    await user.save();
-
-    res.json({ message: 'Profil erfolgreich aktualisiert', user });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // Dashboard
 router.get('/dashboard', verifyToken, async (req, res) => {
   try {
-    // Benutzer anhand der ID aus dem Token finden
     const user = await db.User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    // Daten an das Frontend zurücksenden
     res.json({
       username: user.username,
       email: user.email,
-      // Weitere Benutzerdaten hier hinzufügen, falls notwendig
     });
   } catch (error) {
     console.error('Fehler beim Abrufen des Dashboards:', error);
@@ -169,16 +118,13 @@ router.post('/progress', verifyToken, async (req, res) => {
 // Fortschritt abrufen
 router.get('/progress', verifyToken, async (req, res) => {
   try {
-    const progresses = await db.Progress.findAll({ where: { userid: req.user.id } });
+    const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
 
-    const totalScores = progresses.reduce((sum, entry) => sum + entry.score, 0);
-    const statistics = {
-      averageScore: progresses.length ? (totalScores / progresses.length).toFixed(2) : 0,
-      highestScore: progresses.length ? Math.max(...progresses.map((p) => p.score)) : 0,
-      attempts: progresses.length,
-    };
+    if (!progress || progress.length === 0) {
+      return res.status(404).json({ message: 'Keine Fortschrittsdaten gefunden!' });
+    }
 
-    res.json({ progresses, statistics });
+    res.json(progress);
   } catch (error) {
     console.error('Fehler beim Abrufen des Fortschritts:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
