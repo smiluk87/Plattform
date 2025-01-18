@@ -9,7 +9,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken'); // Verwendung von 'authToken'
       setLoading(true);
       try {
         const res = await fetch('http://localhost:5000/users/profile', {
@@ -34,7 +34,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleSave = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken'); // Verwendung von 'authToken'
     setLoading(true);
     try {
       const res = await fetch('http://localhost:5000/users/profile', {
