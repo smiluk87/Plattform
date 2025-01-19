@@ -199,18 +199,18 @@ router.get('/leaderboard', async (req, res) => {
       include: [
         {
           model: db.User,
-          attributes: ['username'], // Nur den Benutzernamen abrufen
+          as: 'user', // Der Alias, der in der Beziehung definiert wurde
+          attributes: ['username'],
         },
       ],
-      group: ['userid', 'User.id', 'User.username'], // Gruppieren nach Benutzer-ID und Benutzernamen
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']], // Sortieren nach Gesamtpunkten absteigend
+      group: ['userid', 'user.id', 'user.username'],
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
-    // Formatieren der Ergebnisse
     const formattedResults = results.map((result, index) => ({
-      rank: index + 1, // Rang des Benutzers basierend auf der Sortierung
-      username: result.User.username, // Benutzername aus der User-Tabelle
-      totalScore: result.dataValues.totalScore, // Gesamtpunkte
+      rank: index + 1,
+      username: result.user.username,
+      totalScore: result.dataValues.totalScore,
       badge:
         index === 0
           ? 'Gold'
@@ -218,7 +218,7 @@ router.get('/leaderboard', async (req, res) => {
           ? 'Silber'
           : index === 2
           ? 'Bronze'
-          : 'Teilnahme', // Belohnungen basierend auf dem Rang
+          : 'Teilnahme',
     }));
 
     res.json({ leaderboard: formattedResults });

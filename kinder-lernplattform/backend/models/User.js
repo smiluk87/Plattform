@@ -25,5 +25,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  // Assoziationen definieren
+  User.associate = (models) => {
+    User.hasMany(models.Progress, {
+      as: 'progresses', // Alias für die Beziehung
+      foreignKey: 'userid', // Fremdschlüssel
+      onDelete: 'CASCADE', // Lösche Fortschritte, wenn Benutzer gelöscht wird
+    });
+  };
+
   return User;
 };
