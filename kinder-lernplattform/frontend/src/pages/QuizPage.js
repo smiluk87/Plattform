@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Für Navigation
 
 const QuizPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -8,6 +9,8 @@ const QuizPage = () => {
   const [category, setCategory] = useState('math'); // Standardkategorie
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Für Ladezustand
+
+  const navigate = useNavigate(); // Navigation-Handler
 
   // API-Aufruf, um Fragen basierend auf der Kategorie zu laden
   const fetchQuestions = async (subject) => {
@@ -100,7 +103,14 @@ const QuizPage = () => {
   }
 
   if (questions.length === 0) {
-    return <p>{message || 'Keine Fragen gefunden.'}</p>;
+    return (
+      <div>
+        <p>{message || 'Keine Fragen gefunden.'}</p>
+        <button onClick={() => navigate('/dashboard')} style={{ marginTop: '20px' }}>
+          Zum Dashboard
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -129,6 +139,9 @@ const QuizPage = () => {
         Antwort abschicken
       </button>
       <p>Aktueller Punktestand: {score}</p>
+      <button onClick={() => navigate('/dashboard')} style={{ marginTop: '20px' }}>
+        Zum Dashboard
+      </button>
     </div>
   );
 };
