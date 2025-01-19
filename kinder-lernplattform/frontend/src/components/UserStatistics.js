@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './UserStatistics.css'; // CSS für Styling
+import './UserStatistics.css';
 
 const UserStatistics = ({ userId, onClose }) => {
   const [statistics, setStatistics] = useState(null);
@@ -8,7 +8,7 @@ const UserStatistics = ({ userId, onClose }) => {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const token = localStorage.getItem('authToken'); // Token-Key angepasst, um Konsistenz mit der Empfehlung zu wahren
+        const token = localStorage.getItem('authToken');
         const res = await fetch(`http://localhost:5000/users/user/${userId}/statistics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -41,13 +41,8 @@ const UserStatistics = ({ userId, onClose }) => {
         Schließen
       </button>
       <h2>Statistiken für {statistics.username}</h2>
-      <p>
-        <strong>Gesamtpunkte:</strong> {statistics.totalScores}
-      </p>
-      <p>
-        <strong>Durchschnittliche Punkte:</strong>{' '}
-        {statistics.averageScore.toFixed(2)} {/* Durchschnittliche Punkte präzise formatieren */}
-      </p>
+      <p><strong>Gesamtpunkte:</strong> {statistics.totalScores}</p>
+      <p><strong>Durchschnittliche Punkte:</strong> {statistics.averageScore.toFixed(2)}</p>
       <h3>Kategorien:</h3>
       <ul>
         {statistics.categoryProgress.map((category, index) => (
