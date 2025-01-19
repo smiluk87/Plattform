@@ -248,7 +248,7 @@ router.get('/user/:id/statistics', async (req, res) => {
   const userId = req.params.id;
 
   try {
-    // Benutzerinformationen abrufen
+    // Benutzerdaten abrufen
     const user = await db.User.findByPk(userId, {
       attributes: ['username'],
     });
@@ -257,7 +257,7 @@ router.get('/user/:id/statistics', async (req, res) => {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    // Fortschrittsdaten des Nutzers abrufen
+    // Fortschrittsdaten des Benutzers abrufen
     const progressData = await db.Progress.findAll({
       where: { userid: userId },
       attributes: [
@@ -269,13 +269,13 @@ router.get('/user/:id/statistics', async (req, res) => {
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
-    // Statistiken erstellen
+    // Statistiken formatieren
     const statistics = {
       username: user.username,
       totalScores: progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0),
       averageScore:
         progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0) /
-        progressData.reduce((acc, item) => acc + parseInt(item.dataValues.attempts), 0),
+        progressData.length,
       categoryProgress: progressData.map((item) => ({
         category: item.dataValues.category,
         totalScore: item.dataValues.totalScore,
