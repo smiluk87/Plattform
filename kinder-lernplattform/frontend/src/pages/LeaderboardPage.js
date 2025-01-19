@@ -15,7 +15,7 @@ const LeaderboardPage = () => {
     const token = localStorage.getItem('authToken'); // Token abrufen
     try {
       const res = await fetch(
-        `http://localhost:5000/users/leaderboard?category=${category}&page=${page}&limit=6`, // Anfrage mit Kategorie und Paginierung
+        `http://localhost:5000/users/leaderboard?page=${page}&limit=6&category=${category}`, // Anfrage mit Kategorie und Paginierung
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -27,7 +27,7 @@ const LeaderboardPage = () => {
 
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
-      setTotalPages(Math.ceil(data.totalCount / 6)); // Gesamtseiten basierend auf totalCount
+      setTotalPages(data.totalPages || 1); // Gesamtseiten korrekt setzen
     } catch (err) {
       setError(err.message);
     }
@@ -41,11 +41,11 @@ const LeaderboardPage = () => {
   const closeUserStatistics = () => setSelectedUser(null);
 
   const handlePrevious = () => {
-    if (page > 1) setPage(page - 1);
+    if (page > 1) setPage((prev) => prev - 1);
   };
 
   const handleNext = () => {
-    if (page < totalPages) setPage(page + 1);
+    if (page < totalPages) setPage((prev) => prev + 1);
   };
 
   return (
@@ -69,7 +69,7 @@ const LeaderboardPage = () => {
           <option value="english">Englisch</option>
         </select>
       </div>
-      
+
       {/* Rangliste-Tabelle */}
       <table>
         <thead>

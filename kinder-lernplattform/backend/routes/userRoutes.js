@@ -80,49 +80,65 @@ router.get('/dashboard', verifyToken, async (req, res) => {
   }
 });
 
-// Benutzerstatistiken abrufen
-router.get('/:userId/statistics', verifyToken, async (req, res) => {
-  const userId = req.params.userId;
+// Rangliste abrufen (mit Kategoriefilterung und Paginierung)
+router.get('/leaderboard', async (req, res) => {
+  const { page = 1, limit = 6, category } = req.query;
+  const offset = (page - 1) * limit;
 
   try {
-    const user = await db.User.findByPk(userId, {
-      attributes: ['username'],
+    const whereCondition = category ? { category } : {}; // Kategorie filtern, falls angegeben
+
+    const results = await db.Progress.findAll({
+      attributes: [
+        'userid',
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
+      ],
       include: [
         {
-          model: db.Progress,
-          as: 'progresses',
-          attributes: ['category', 'score'],
+          model: db.User,
+          as: 'user',
+          attributes: ['username'],
         },
       ],
+      where: whereCondition, // Kategoriebedingung
+      group: ['userid', 'user.id', 'user.username'],
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-    }
+    const totalResults = await db.Progress.count({
+      where: whereCondition,
+      distinct: true,
+      col: 'userid',
+    });
 
-    const categoryProgress = user.progresses.reduce((acc, progress) => {
-      acc[progress.category] = (acc[progress.category] || 0) + progress.score;
-      return acc;
-    }, {});
-
-    const totalScores = Object.values(categoryProgress).reduce((sum, val) => sum + val, 0);
-    const attempts = user.progresses.length;
-    const averageScore = attempts > 0 ? (totalScores / attempts).toFixed(2) : 0;
+    const formattedResults = results.map((result, index) => ({
+      rank: index + 1 + offset,
+      username: result.user.username,
+      totalScore: result.dataValues.totalScore,
+      badge:
+        index === 0
+          ? 'Gold'
+          : index === 1
+          ? 'Silber'
+          : index === 2
+          ? 'Bronze'
+          : 'Teilnahme',
+    }));
 
     res.json({
-      username: user.username,
-      totalScores,
-      averageScore,
-      categoryProgress,
-      attempts,
+      leaderboard: formattedResults,
+      totalPages: Math.ceil(totalResults / limit),
+      currentPage: parseInt(page),
     });
   } catch (error) {
-    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!' });
+    console.error('Fehler beim Abrufen der Rangliste:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!' });
   }
 });
 
-// Profil abrufen (neue Route, empfohlen)
+// Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
@@ -166,53 +182,6 @@ router.put('/profile', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Fehler beim Aktualisieren des Profils:', error);
     res.status(500).json({ message: 'Fehler beim Aktualisieren des Profils!' });
-  }
-});
-
-// Rangliste abrufen (mit Kategoriefilterung und Paginierung)
-router.get('/leaderboard', async (req, res) => {
-  const { category = '', page = 1, limit = 6 } = req.query;
-  const offset = (page - 1) * limit;
-
-  try {
-    const whereClause = category ? { category } : {};
-    const results = await db.Progress.findAll({
-      attributes: [
-        'userid',
-        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
-      ],
-      where: whereClause,
-      include: [
-        {
-          model: db.User,
-          as: 'user',
-          attributes: ['username'],
-        },
-      ],
-      group: ['userid', 'user.id', 'user.username'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-    });
-
-    const formattedResults = results.map((result, index) => ({
-      rank: index + 1 + offset,
-      username: result.user.username,
-      totalScore: result.dataValues.totalScore,
-      badge:
-        index === 0
-          ? 'Gold'
-          : index === 1
-          ? 'Silber'
-          : index === 2
-          ? 'Bronze'
-          : 'Teilnahme',
-    }));
-
-    res.json({ leaderboard: formattedResults });
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Rangliste:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Rangliste!' });
   }
 });
 
