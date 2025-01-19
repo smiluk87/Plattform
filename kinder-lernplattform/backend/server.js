@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes); // Alle Routen sind unter '/auth/*' erreichbar, z. B. '/auth/login'
 
 // Benutzer-, Fortschritts- und Quizrouten registrieren
-app.use('/api/users', userRoutes); // Alle Routen sind unter '/api/users/*' erreichbar
+app.use('/users', userRoutes); // Alle Routen sind unter '/api/users/*' erreichbar
 
 // Fehlerbehandlung für nicht gefundene Routen
 app.use((req, res, next) => {
