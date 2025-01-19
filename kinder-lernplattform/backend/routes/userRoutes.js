@@ -194,4 +194,28 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
   }
 });
 
+// Quizfragen abrufen
+router.get('/quiz/:subject', verifyToken, (req, res) => {
+  const subject = req.params.subject;
+
+  const quizData = {
+    math: [
+      { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
+      { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
+    ],
+    english: [
+      { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
+      { question: "What is the opposite of 'happy'?", options: ['outraged', 'sad', 'overwhelmed'], answer: 'sad' },
+    ],
+  };
+
+  const questions = quizData[subject];
+
+  if (!questions) {
+    return res.status(404).json({ message: 'Keine Fragen für dieses Thema gefunden!' });
+  }
+
+  res.json(questions);
+});
+
 module.exports = router;

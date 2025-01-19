@@ -9,6 +9,8 @@ const QuizPage = () => {
   const [category, setCategory] = useState('math'); // Standardkategorie
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // Für Ladezustand
+  const [error, setError] = useState('');
+  const [isFinished, setIsFinished] = useState(false);
 
   const navigate = useNavigate(); // Navigation-Handler
 
@@ -19,6 +21,7 @@ const QuizPage = () => {
     console.log('Kategorie für Quiz-Anfrage:', subject); // Debugging
     setLoading(true);
     setMessage(''); // Zurücksetzen von Nachrichten
+    setError(''); // Zurücksetzen von Fehlern
     try {
       const res = await fetch(`http://localhost:5000/users/quiz/${subject}`, {
         method: 'GET',
@@ -43,21 +46,23 @@ const QuizPage = () => {
       setScore(0); // Punktestand zurücksetzen
       setSelectedOption(''); // Auswahl zurücksetzen
       setCurrentQuestionIndex(0); // Index zurücksetzen
+      setIsFinished(false); // Reset bei erfolgreichem Abruf
     } catch (err) {
       console.error('Fehler beim Abrufen der Quizfragen:', err); // Debugging
-      setMessage('Fehler beim Laden der Quizfragen.');
+      setError('Fehler beim Laden der Quizfragen.');
       setQuestions([]); // Zurücksetzen bei Fehler
     } finally {
       setLoading(false);
     }
   };
 
+  // Lade die Fragen immer, wenn sich die Kategorie ändert
   useEffect(() => {
     fetchQuestions(category); // Laden der Fragen bei Änderung der Kategorie
   }, [category]);
 
   // Antwort absenden und Fortschritt berechnen
-  const handleSubmitAnswer = async () => {
+  const handleSubmitAnswer = () => {
     const currentQuestion = questions[currentQuestionIndex];
     if (selectedOption === currentQuestion.answer) {
       setScore(score + 1); // Punktestand aktualisieren
@@ -68,8 +73,9 @@ const QuizPage = () => {
       setSelectedOption(''); // Auswahl zurücksetzen
     } else {
       const finalScore = score + (selectedOption === currentQuestion.answer ? 1 : 0);
+      setIsFinished(true); // Quiz abgeschlossen
       setMessage(`Quiz abgeschlossen! Dein Punktestand: ${finalScore}`);
-      await saveProgress(finalScore); // Fortschritt speichern
+      saveProgress(finalScore); // Fortschritt speichern
     }
   };
 
@@ -102,6 +108,10 @@ const QuizPage = () => {
     return <p>Lade Fragen...</p>;
   }
 
+  if (error) {
+    return <p style={{ color: 'red' }}>{error}</p>;
+  }
+
   if (questions.length === 0) {
     return (
       <div>
@@ -116,29 +126,44 @@ const QuizPage = () => {
   return (
     <div>
       <h1>Quiz</h1>
+      {!isFinished ? (
+        <div>
+          <h2>{questions[currentQuestionIndex]?.question}</h2>
+          {questions[currentQuestionIndex]?.options.map((option, index) => (
+            <div key={index}>
+              <input
+                type="radio"
+                value={option}
+                checked={selectedOption === option}
+                onChange={(e) => setSelectedOption(e.target.value)}
+              />
+              {option}
+            </div>
+          ))}
+          <button onClick={handleSubmitAnswer} disabled={!selectedOption}>
+            Antwort abschicken
+          </button>
+          <p>Aktueller Punktestand: {score}</p>
+        </div>
+      ) : (
+        <div>
+          <h2>Quiz abgeschlossen!</h2>
+          <p>Ihr Punktestand: {score} von {questions.length}</p>
+          <button onClick={() => setIsFinished(false)}>Erneut versuchen</button>
+        </div>
+      )}
+
       <div>
-        <label>Wähle eine Kategorie:</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <label htmlFor="subject">Kategorie wählen:</label>
+        <select
+          id="subject"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
           <option value="math">Mathe</option>
           <option value="english">Englisch</option>
         </select>
       </div>
-      <h2>{questions[currentQuestionIndex]?.question}</h2>
-      {questions[currentQuestionIndex]?.options.map((option, index) => (
-        <div key={index}>
-          <input
-            type="radio"
-            value={option}
-            checked={selectedOption === option}
-            onChange={(e) => setSelectedOption(e.target.value)}
-          />
-          {option}
-        </div>
-      ))}
-      <button onClick={handleSubmitAnswer} disabled={!selectedOption}>
-        Antwort abschicken
-      </button>
-      <p>Aktueller Punktestand: {score}</p>
       <button onClick={() => navigate('/dashboard')} style={{ marginTop: '20px' }}>
         Zum Dashboard
       </button>
