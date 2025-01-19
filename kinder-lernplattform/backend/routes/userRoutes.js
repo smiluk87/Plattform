@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt'); // bcrypt für Passwort-Hashing und -Vergleich
+const bcrypt = require('bcrypt');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10); // Passwort hashen
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await db.User.create({ username, email, password: hashedPassword });
     res.status(201).json({ message: 'Benutzer erfolgreich erstellt!', user });
   } catch (error) {
@@ -22,7 +22,6 @@ router.post('/users', async (req, res) => {
 // Registrierung
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Alle Felder sind erforderlich!' });
   }
@@ -40,14 +39,12 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({ message: 'E-Mail und Passwort sind erforderlich!' });
   }
 
   try {
     const user = await db.User.findOne({ where: { email } });
-
     if (!user) {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
@@ -83,21 +80,45 @@ router.get('/dashboard', verifyToken, async (req, res) => {
   }
 });
 
-// Profil abrufen
-router.get('/profile', verifyToken, async (req, res) => {
+// Benutzerstatistiken abrufen
+router.get('/:userId/statistics', verifyToken, async (req, res) => {
+  const userId = req.params.userId;
+
   try {
-    const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'],
+    const user = await db.User.findByPk(userId, {
+      attributes: ['username'],
+      include: [
+        {
+          model: db.Progress,
+          as: 'progresses',
+          attributes: ['category', 'score'],
+        },
+      ],
     });
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    res.json({ id: user.id, username: user.username, email: user.email });
+    const categoryProgress = user.progresses.reduce((acc, progress) => {
+      acc[progress.category] = (acc[progress.category] || 0) + progress.score;
+      return acc;
+    }, {});
+
+    const totalScores = Object.values(categoryProgress).reduce((sum, val) => sum + val, 0);
+    const attempts = user.progresses.length;
+    const averageScore = attempts > 0 ? (totalScores / attempts).toFixed(2) : 0;
+
+    res.json({
+      username: user.username,
+      totalScores,
+      averageScore,
+      categoryProgress,
+      attempts,
+    });
   } catch (error) {
-    console.error('Fehler beim Abrufen des Profils:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
+    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!' });
   }
 });
 
@@ -126,89 +147,34 @@ router.put('/profile', verifyToken, async (req, res) => {
   }
 });
 
-// Quizfragen abrufen
-router.get('/quiz/:subject', verifyToken, (req, res) => {
-  const subject = req.params.subject;
-
-  const quizData = {
-    math: [
-      { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
-      { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
-    ],
-    english: [
-      { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
-      { question: "What is the opposite of 'happy'?", options: ['outraged', 'sad', 'overwhelmed'], answer: 'sad' },
-    ],
-  };
-
-  const questions = quizData[subject];
-  if (!questions) {
-    return res.status(404).json({ message: 'Thema nicht gefunden!' });
-  }
-
-  res.json(questions);
-});
-
-// Fortschritt speichern
-router.post('/progress', verifyToken, async (req, res) => {
-  const { category, score } = req.body;
-
-  if (!category || score === undefined) {
-    return res.status(400).json({ message: 'Kategorie und Score sind erforderlich!' });
-  }
+// Rangliste abrufen (mit Kategoriefilterung und Paginierung)
+router.get('/leaderboard', verifyToken, async (req, res) => {
+  const { category = '', page = 1, limit = 6 } = req.query;
+  const offset = (page - 1) * limit;
 
   try {
-    const progress = await db.Progress.create({
-      userid: req.user.id,
-      category,
-      score,
-      timestamp: new Date(),
-    });
-
-    res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress });
-  } catch (error) {
-    console.error('Fehler beim Speichern des Fortschritts:', error);
-    res.status(500).json({ message: 'Fehler beim Speichern des Fortschritts!', error: error.message });
-  }
-});
-
-// Fortschritt abrufen
-router.get('/progress', verifyToken, async (req, res) => {
-  try {
-    const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
-
-    if (!progress || progress.length === 0) {
-      return res.status(404).json({ message: 'Keine Fortschrittsdaten gefunden!' });
-    }
-
-    res.json(progress);
-  } catch (error) {
-    console.error('Fehler beim Abrufen des Fortschritts:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
-  }
-});
-
-// Rangliste abrufen
-router.get('/leaderboard', async (req, res) => {
-  try {
+    const whereClause = category ? { category } : {};
     const results = await db.Progress.findAll({
       attributes: [
         'userid',
         [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
       ],
+      where: whereClause,
       include: [
         {
           model: db.User,
-          as: 'user', // Der Alias, der in der Beziehung definiert wurde
+          as: 'user',
           attributes: ['username'],
         },
       ],
       group: ['userid', 'user.id', 'user.username'],
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
     });
 
     const formattedResults = results.map((result, index) => ({
-      rank: index + 1,
+      rank: offset + index + 1,
       username: result.user.username,
       totalScore: result.dataValues.totalScore,
       badge:

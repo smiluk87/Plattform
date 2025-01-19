@@ -13,9 +13,12 @@ const LeaderboardPage = () => {
   const fetchLeaderboard = useCallback(async () => {
     const token = localStorage.getItem('authToken'); // Token abrufen
     try {
-      const res = await fetch('http://localhost:5000/users/leaderboard', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/users/leaderboard?category=${category}&page=${page}&limit=6`, // Anfrage mit Kategorie und Paginierung
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) {
         throw new Error('Fehler beim Abrufen der Rangliste.');
@@ -23,14 +26,18 @@ const LeaderboardPage = () => {
 
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
+      setTotalPages(Math.ceil(data.totalCount / 6)); // Berechnung der Gesamtseiten basierend auf totalCount
     } catch (err) {
       setError(err.message);
     }
-  }, []);
+  }, [category, page]);
 
   useEffect(() => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
+
+  const openUserStatistics = (userId) => setSelectedUser(userId);
+  const closeUserStatistics = () => setSelectedUser(null);
 
   const handlePrevious = () => {
     if (page > 1) setPage(page - 1);
@@ -40,18 +47,12 @@ const LeaderboardPage = () => {
     if (page < totalPages) setPage(page + 1);
   };
 
-  const openUserStatistics = (userId) => {
-    setSelectedUser(userId);
-  };
-
-  const closeUserStatistics = () => {
-    setSelectedUser(null);
-  };
-
   return (
     <div>
       <h1>Rangliste</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      
+      {/* Kategorie-Auswahl */}
       <div>
         <label htmlFor="category">Kategorie wählen:</label>
         <select
@@ -59,7 +60,7 @@ const LeaderboardPage = () => {
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
-            setPage(1);
+            setPage(1); // Seite zurücksetzen, wenn Kategorie geändert wird
           }}
         >
           <option value="">Alle Kategorien</option>
@@ -67,19 +68,8 @@ const LeaderboardPage = () => {
           <option value="english">Englisch</option>
         </select>
       </div>
-      <div>
-        <label htmlFor="search">Benutzer suchen:</label>
-        <input
-          type="text"
-          id="search"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          placeholder="Benutzername eingeben"
-        />
-      </div>
+      
+      {/* Rangliste-Tabelle */}
       <table>
         <thead>
           <tr>
@@ -110,7 +100,7 @@ const LeaderboardPage = () => {
                 <td>{user.rank}</td>
                 <td>{user.username}</td>
                 <td>{user.totalScore}</td>
-                <td>{user.badge || '—'}</td>
+                <td>{user.badge}</td>
               </tr>
             ))
           ) : (
@@ -122,6 +112,8 @@ const LeaderboardPage = () => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
       <div>
         <button onClick={handlePrevious} disabled={page === 1}>
           Vorherige
@@ -133,9 +125,9 @@ const LeaderboardPage = () => {
           Nächste
         </button>
       </div>
-      {selectedUser && (
-        <UserStatistics userId={selectedUser} onClose={closeUserStatistics} />
-      )}
+
+      {/* Benutzerstatistiken anzeigen */}
+      {selectedUser && <UserStatistics userId={selectedUser} onClose={closeUserStatistics} />}
     </div>
   );
 };
