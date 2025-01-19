@@ -248,21 +248,45 @@ router.get('/user/:id/statistics', async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const userProgress = await db.Progress.findAll({
+    const user = await db.User.findByPk(userId, {
+      attributes: ['username'],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    const progressData = await db.Progress.findAll({
       where: { userid: userId },
-      attributes: ['category', [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore']],
+      attributes: [
+        'category',
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
+        [db.Sequelize.fn('COUNT', db.Sequelize.col('category')), 'attempts'],
+      ],
       group: ['category'],
     });
 
-    const formattedProgress = userProgress.map((progress) => ({
-      category: progress.category,
-      totalScore: progress.dataValues.totalScore,
-    }));
+    const totalScores = progressData.reduce(
+      (acc, item) => acc + parseInt(item.dataValues.totalScore),
+      0
+    );
+    const averageScore = totalScores / (progressData.length || 1);
 
-    res.json({ userId, statistics: formattedProgress });
+    const statistics = {
+      username: user.username,
+      totalScores,
+      averageScore: averageScore.toFixed(2),
+      categoryProgress: progressData.map((item) => ({
+        category: item.dataValues.category,
+        totalScore: item.dataValues.totalScore,
+        attempts: item.dataValues.attempts,
+      })),
+    };
+
+    res.json(statistics);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!' });
+    console.error('Fehler beim Abrufen der Statistiken:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Statistiken!' });
   }
 });
 
