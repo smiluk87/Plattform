@@ -11,9 +11,9 @@ const LeaderboardPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchLeaderboard = useCallback(async () => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken'); // Token abrufen
     try {
-      const res = await fetch(`http://localhost:5000/users/leaderboard?page=${page}&category=${category}&search=${search}`, {
+      const res = await fetch('http://localhost:5000/users/leaderboard', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -23,11 +23,10 @@ const LeaderboardPage = () => {
 
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
-      setTotalPages(data.totalPages || 1); // Backend sollte `totalPages` liefern
     } catch (err) {
       setError(err.message);
     }
-  }, [page, category, search]);
+  }, []);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -92,26 +91,26 @@ const LeaderboardPage = () => {
         </thead>
         <tbody>
           {leaderboard.length > 0 ? (
-            leaderboard.map((user, index) => (
+            leaderboard.map((user) => (
               <tr
-                key={user.userid}
-                onClick={() => openUserStatistics(user.userid)}
+                key={user.rank}
+                onClick={() => openUserStatistics(user.userId)}
                 style={{
                   backgroundColor:
-                    user.reward === 'Gold'
+                    user.badge === 'Gold'
                       ? '#FFD700'
-                      : user.reward === 'Silber'
+                      : user.badge === 'Silber'
                       ? '#C0C0C0'
-                      : user.reward === 'Bronze'
+                      : user.badge === 'Bronze'
                       ? '#CD7F32'
                       : 'transparent',
                   cursor: 'pointer',
                 }}
               >
-                <td>{index + 1 + (page - 1) * 5}</td>
-                <td>{user.User.username}</td>
+                <td>{user.rank}</td>
+                <td>{user.username}</td>
                 <td>{user.totalScore}</td>
-                <td>{user.reward || '—'}</td>
+                <td>{user.badge || '—'}</td>
               </tr>
             ))
           ) : (
