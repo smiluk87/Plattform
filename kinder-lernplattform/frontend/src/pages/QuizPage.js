@@ -20,7 +20,7 @@ const QuizPage = () => {
     setLoading(true);
     setMessage(''); // Zurücksetzen von Nachrichten
     try {
-      const res = await fetch(`http://localhost:5000/api/users/quiz/${subject}`, {
+      const res = await fetch(`http://localhost:5000/users/quiz/${subject}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ const QuizPage = () => {
     const token = localStorage.getItem('authToken');
     console.log('Fortschritt speichern. Token:', token); // Debugging
     try {
-      const res = await fetch('http://localhost:5000/api/users/progress', {
+      const res = await fetch('http://localhost:5000/users/progress', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
