@@ -1,0 +1,20 @@
+## Funktionale Anforderungen 
+1.	Benutzerregistrierung und -anmeldung:
+    o	Benutzer (Kinder, Eltern, Lehrer) können sich registrieren und anmelden.
+    o	Authentifizierung erfolgt über JWT.
+2.	Lernmodule:
+    o	Mathematische und englische Übungen werden bereitgestellt.
+    o	Fortschrittsanzeige für absolvierte Module.
+3.	Gamification-Elemente:
+    o	Punkte- und Belohnungssystem.
+    o	Level-System für Kinder.
+4.	Elternkontrolle:
+    o	Eltern können den Fortschritt ihrer Kinder einsehen.
+5.	Tägliche Herausforderungen:
+    o	Kinder erhalten tägliche Aufgaben, die nach Abschluss Belohnungen geben.
+6.	Ranglisten:
+    o	Zeigt die besten Spieler basierend auf Punkten an.
+7.	Datenverwaltung:
+    o	Speicherung von Benutzerinformationen, Modulen und Fortschritten in der Datenbank.
+8.	Feedback:
+    o	Benutzer können nach Abschluss von Modulen Feedback geben.

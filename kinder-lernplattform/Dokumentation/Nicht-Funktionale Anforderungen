@@ -1,0 +1,16 @@
+## Nicht-Funktionale Anforderungen 
+1.	Leistung:
+    o	Die Plattform muss innerhalb von 2 Sekunden auf Benutzereingaben reagieren.
+2.	Skalierbarkeit:
+    o	Muss 1.000 gleichzeitige Benutzer unterstützen.
+3.	Sicherheit:
+    o	Passwörter werden mit bcrypt gehasht.
+    o	Schutz der Daten durch HTTPS und JWT.
+4.	Verfügbarkeit:
+    o	Plattform ist zu 99,9 % der Zeit online.
+5.	Benutzerfreundlichkeit:
+    o	Kindgerechte und intuitive Navigation.
+6.	Portabilität:
+    o	Die Plattform muss auf Mobilgeräten und Desktops laufen.
+7.	Wartbarkeit:
+    o	Der Code ist modular aufgebaut und dokumentiert.
