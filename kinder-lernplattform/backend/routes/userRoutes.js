@@ -188,10 +188,13 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
     math: [
       { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
       { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
+      { question: 'Was ist 8 * 5?', options: ['20', '24', '40'], answer: '40' },
+      { question: 'Was ist 88 / 11?', options: ['6', '8', '9'], answer: '8' },
     ],
     english: [
       { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
       { question: "What is the opposite of 'happy'?", options: ['outraged', 'sad', 'overwhelmed'], answer: 'sad' },
+      { question: "How many days are in a 'week'?", options: ['five', 'seven', 'ten'], answer: 'seven' },
     ],
   };
 
