@@ -103,11 +103,7 @@ const LeaderboardPage = () => {
                 <td>
                   {/* Benutzername anklickbar machen */}
                   <span
-                    style={{
-                      color: 'blue',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                    }}
+                    style={{color: 'blue', cursor: 'pointer', textDecoration: 'underline'}}
                     onClick={() => openUserStatistics(user.userId)} // Benutzer-ID übergeben
                   >
                     {user.username}
