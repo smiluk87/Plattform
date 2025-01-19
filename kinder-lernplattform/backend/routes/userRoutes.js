@@ -78,7 +78,7 @@ router.get('/dashboard', verifyToken, async (req, res) => {
   }
 });
 
-// Profil abrufen (angepasst)
+// Profil abrufen
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
@@ -90,13 +90,43 @@ router.get('/profile', verifyToken, async (req, res) => {
     }
 
     res.json({
-      id: user.id, // Auch die ID wird jetzt zurückgegeben
+      id: user.id,
       username: user.username,
       email: user.email,
     });
   } catch (error) {
     console.error('Fehler beim Abrufen des Profils:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
+  }
+});
+
+// Profil aktualisieren (NEU hinzugefügt)
+router.put('/profile', verifyToken, async (req, res) => {
+  const { username, email } = req.body;
+
+  try {
+    const user = await db.User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    // Benutzer aktualisieren
+    user.username = username || user.username;
+    user.email = email || user.email;
+    await user.save();
+
+    res.json({
+      message: 'Profil erfolgreich aktualisiert!',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Profils:', error);
+    res.status(500).json({ message: 'Fehler beim Aktualisieren des Profils!' });
   }
 });
 
