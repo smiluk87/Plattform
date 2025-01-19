@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 
 const quizQuestions = {
@@ -23,4 +23,4 @@ router.get('/:category', (req, res) => {
   res.json(questions);
 });
 
-module.exports = router;
+module.exports = router;+*/
