@@ -86,7 +86,7 @@ router.get('/leaderboard', async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    const whereCondition = category ? { category } : {};
+    const whereCondition = category ? { category } : {}; // Kategorie filtern, falls angegeben
 
     const results = await db.Progress.findAll({
       attributes: [
@@ -243,47 +243,28 @@ router.get('/progress', verifyToken, async (req, res) => {
   }
 });
 
-// Statistiken für einen Benutzer abrufen
+// Benutzerstatistiken abrufen
 router.get('/user/:id/statistics', async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const user = await db.User.findByPk(userId, {
-      attributes: ['username'],
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-    }
-
-    const progressData = await db.Progress.findAll({
+    const statistics = await db.Progress.findAll({
       where: { userid: userId },
       attributes: [
         'category',
         [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
-        [db.Sequelize.fn('COUNT', db.Sequelize.col('category')), 'attempts'],
       ],
       group: ['category'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
-    const statistics = {
-      username: user.username,
-      totalScores: progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0),
-      averageScore:
-        progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0) /
-        progressData.reduce((acc, item) => acc + parseInt(item.dataValues.attempts), 0),
-      categoryProgress: progressData.map((item) => ({
-        category: item.dataValues.category,
-        totalScore: item.dataValues.totalScore,
-        attempts: item.dataValues.attempts,
-      })),
-    };
+    if (statistics.length === 0) {
+      return res.status(404).json({ message: 'Keine Statistiken für diesen Benutzer gefunden!' });
+    }
 
     res.json(statistics);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Statistiken:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Statistiken!' });
+    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!', error: error.message });
   }
 });
 
