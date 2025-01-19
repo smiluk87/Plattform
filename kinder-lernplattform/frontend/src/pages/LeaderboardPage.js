@@ -7,14 +7,14 @@ const LeaderboardPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null); // Neu: Zustand für ausgewählten Benutzer
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Funktion zum Abrufen der Rangliste mit Paginierung
   const fetchLeaderboard = useCallback(async () => {
-    const token = localStorage.getItem('authToken'); // Token abrufen
+    const token = localStorage.getItem('authToken'); // Authentifizierungs-Token abrufen
     try {
       const res = await fetch(
-        `http://localhost:5000/users/leaderboard?page=${page}&limit=6&category=${category}`, // Anfrage mit Kategorie und Paginierung
+        `http://localhost:5000/users/leaderboard?page=${page}&limit=6&category=${category}`, // API-Anfrage mit Paginierung und Kategorie
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -25,15 +25,15 @@ const LeaderboardPage = () => {
       }
 
       const data = await res.json();
-      setLeaderboard(data.leaderboard || []);
-      setTotalPages(data.totalPages || 1); // Gesamtseiten korrekt setzen
+      setLeaderboard(data.leaderboard || []); // Ranglisten-Daten setzen
+      setTotalPages(data.totalPages || 1); // Gesamtseitenanzahl setzen
     } catch (err) {
-      setError(err.message);
+      setError(err.message); // Fehler im State speichern
     }
   }, [category, page]);
 
   useEffect(() => {
-    fetchLeaderboard();
+    fetchLeaderboard(); // Ranglisten-Daten bei Änderungen abrufen
   }, [fetchLeaderboard]);
 
   // Benutzerstatistiken öffnen
@@ -64,7 +64,7 @@ const LeaderboardPage = () => {
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
-            setPage(1); // Seite zurücksetzen, wenn Kategorie geändert wird
+            setPage(1); // Bei Kategorienwechsel zur ersten Seite springen
           }}
         >
           <option value="">Alle Kategorien</option>
@@ -103,7 +103,11 @@ const LeaderboardPage = () => {
                 <td>
                   {/* Benutzername anklickbar machen */}
                   <span
-                    style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{
+                      color: 'blue',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                    }}
                     onClick={() => openUserStatistics(user.userId)} // Benutzer-ID übergeben
                   >
                     {user.username}
