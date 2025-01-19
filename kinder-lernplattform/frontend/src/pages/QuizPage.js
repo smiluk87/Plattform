@@ -75,12 +75,17 @@ const QuizPage = () => {
       const finalScore = score + (selectedOption === currentQuestion.answer ? 1 : 0);
       setIsFinished(true); // Quiz abgeschlossen
       setMessage(`Quiz abgeschlossen! Dein Punktestand: ${finalScore}`);
-      saveProgress(finalScore); // Fortschritt speichern
+      handleQuizSubmit(category, finalScore); // Funktion zum Speichern des Fortschritts aufrufen
     }
   };
 
+  // Funktion zum Speichern des Fortschritts, die aufgerufen wird, wenn das Quiz abgeschlossen ist
+  const handleQuizSubmit = (category, score) => {
+    saveProgress(category, score); // Aufruf der saveProgress-Funktion
+  };
+
   // Fortschritt speichern
-  const saveProgress = async (finalScore) => {
+  const saveProgress = async (category, score) => {
     const token = localStorage.getItem('authToken');
     console.log('Fortschritt speichern. Token:', token); // Debugging
     try {
@@ -90,17 +95,18 @@ const QuizPage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ category, score: finalScore }),
+        body: JSON.stringify({ category, score }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        alert(`Fortschritt gespeichert: ${data.message}`);
-      } else {
-        console.error('Fehler beim Speichern des Fortschritts:', res.statusText);
+      if (!res.ok) {
+        throw new Error('Fehler beim Speichern des Fortschritts');
       }
+
+      const data = await res.json();
+      console.log('Fortschritt erfolgreich gespeichert:', data); // Debugging
+      alert(`Fortschritt gespeichert: ${data.message}`);
     } catch (err) {
-      console.error('Fehler beim Speichern des Fortschritts:', err); // Debugging
+      console.error('Fehler beim Speichern des Fortschritts:', err.message); // Debugging
     }
   };
 

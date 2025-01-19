@@ -148,7 +148,7 @@ router.put('/profile', verifyToken, async (req, res) => {
 });
 
 // Rangliste abrufen (mit Kategoriefilterung und Paginierung)
-router.get('/leaderboard', verifyToken, async (req, res) => {
+router.get('/leaderboard', async (req, res) => {
   const { category = '', page = 1, limit = 6 } = req.query;
   const offset = (page - 1) * limit;
 
@@ -169,12 +169,12 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
       ],
       group: ['userid', 'user.id', 'user.username'],
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
-      limit: parseInt(limit, 10),
-      offset: parseInt(offset, 10),
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
     const formattedResults = results.map((result, index) => ({
-      rank: offset + index + 1,
+      rank: index + 1 + offset,
       username: result.user.username,
       totalScore: result.dataValues.totalScore,
       badge:
@@ -216,6 +216,45 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
   }
 
   res.json(questions);
+});
+
+// Fortschritt speichern (POST /progress)
+router.post('/progress', verifyToken, async (req, res) => {
+  const { category, score } = req.body;
+
+  if (!category || score === undefined) {
+    return res.status(400).json({ message: 'Kategorie und Score sind erforderlich!' });
+  }
+
+  try {
+    const progress = await db.Progress.create({
+      userid: req.user.id,
+      category,
+      score,
+      timestamp: new Date(),
+    });
+
+    res.status(201).json({ message: 'Fortschritt erfolgreich gespeichert!', progress });
+  } catch (error) {
+    console.error('Fehler beim Speichern des Fortschritts:', error);
+    res.status(500).json({ message: 'Fehler beim Speichern des Fortschritts!', error: error.message });
+  }
+});
+
+// Fortschritt abrufen (GET /progress)
+router.get('/progress', verifyToken, async (req, res) => {
+  try {
+    const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
+
+    if (!progress || progress.length === 0) {
+      return res.status(404).json({ message: 'Keine Fortschrittsdaten gefunden!' });
+    }
+
+    res.json(progress);
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Fortschritts:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
+  }
 });
 
 module.exports = router;

@@ -10,6 +10,7 @@ const LeaderboardPage = () => {
   const [error, setError] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
 
+  // Funktion zum Abrufen der Rangliste mit Paginierung
   const fetchLeaderboard = useCallback(async () => {
     const token = localStorage.getItem('authToken'); // Token abrufen
     try {
@@ -26,7 +27,7 @@ const LeaderboardPage = () => {
 
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
-      setTotalPages(Math.ceil(data.totalCount / 6)); // Berechnung der Gesamtseiten basierend auf totalCount
+      setTotalPages(Math.ceil(data.totalCount / 6)); // Gesamtseiten basierend auf totalCount
     } catch (err) {
       setError(err.message);
     }
