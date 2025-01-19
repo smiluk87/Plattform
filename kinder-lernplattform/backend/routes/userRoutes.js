@@ -248,45 +248,21 @@ router.get('/user/:id/statistics', async (req, res) => {
   const userId = req.params.id;
 
   try {
-    // Benutzerdaten abrufen
-    const user = await db.User.findByPk(userId, {
-      attributes: ['username'],
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
-    }
-
-    // Fortschrittsdaten des Benutzers abrufen
-    const progressData = await db.Progress.findAll({
+    const userProgress = await db.Progress.findAll({
       where: { userid: userId },
-      attributes: [
-        'category',
-        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
-        [db.Sequelize.fn('COUNT', db.Sequelize.col('category')), 'attempts'],
-      ],
+      attributes: ['category', [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore']],
       group: ['category'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
-    // Statistiken formatieren
-    const statistics = {
-      username: user.username,
-      totalScores: progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0),
-      averageScore:
-        progressData.reduce((acc, item) => acc + parseInt(item.dataValues.totalScore), 0) /
-        progressData.length,
-      categoryProgress: progressData.map((item) => ({
-        category: item.dataValues.category,
-        totalScore: item.dataValues.totalScore,
-        attempts: item.dataValues.attempts,
-      })),
-    };
+    const formattedProgress = userProgress.map((progress) => ({
+      category: progress.category,
+      totalScore: progress.dataValues.totalScore,
+    }));
 
-    res.json(statistics);
+    res.json({ userId, statistics: formattedProgress });
   } catch (error) {
-    console.error('Fehler beim Abrufen der Statistiken:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen der Statistiken!' });
+    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!' });
   }
 });
 
