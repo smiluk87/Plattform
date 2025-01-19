@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProfile } from '../utils/api'; // Importiere die fetchProfile-Funktion
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({ username: '', email: '' });
@@ -8,9 +7,10 @@ const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // useEffect zum Abrufen der Profildaten
   useEffect(() => {
     const fetchProfileData = async () => {
-      const token = localStorage.getItem('authToken'); // Token aus dem LocalStorage abrufen
+      const token = localStorage.getItem('authToken'); // Token aus LocalStorage
       if (!token) {
         setError('Authentifizierung fehlgeschlagen. Bitte melden Sie sich an.');
         return;
@@ -18,7 +18,15 @@ const ProfilePage = () => {
 
       setLoading(true);
       try {
-        const data = await fetchProfile(token); // Verwendung der fetchProfile-Funktion
+        const res = await fetch('http://localhost:5000/users/profile', {
+          headers: { Authorization: `Bearer ${token}` }, // Authentifizierung über Bearer-Token
+        });
+
+        if (!res.ok) {
+          throw new Error('Fehler beim Abrufen des Profils');
+        }
+
+        const data = await res.json();
         setUserData({ username: data.username, email: data.email });
         setError('');
       } catch (err) {
@@ -31,6 +39,7 @@ const ProfilePage = () => {
     fetchProfileData();
   }, []);
 
+  // Funktion zum Speichern von Änderungen (editMode)
   const handleSave = async () => {
     const token = localStorage.getItem('authToken'); // Token abrufen
     if (!token) {
@@ -44,9 +53,9 @@ const ProfilePage = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Token im Header für Authentifizierung
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(userData), // Profiländerungen als JSON senden
       });
 
       if (!res.ok) {
@@ -68,6 +77,7 @@ const ProfilePage = () => {
     }
   };
 
+  // Funktion zum Ändern der Eingabefelder
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };

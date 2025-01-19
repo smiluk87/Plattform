@@ -3,7 +3,7 @@ const db = require('../models'); // Import des Datenbankmodells
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
 const verifyToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Verwendung von optionalem Chaining
+  const token = req.headers['authorization']?.split(' ')[1]; // Verwendung von optionalem Chaining
 
   if (!token) {
     return res.status(401).json({ message: 'Zugriff verweigert. Kein Token vorhanden.' }); // Konsistente Fehlermeldung

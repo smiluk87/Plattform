@@ -122,6 +122,28 @@ router.get('/:userId/statistics', verifyToken, async (req, res) => {
   }
 });
 
+// Profil abrufen (neue Route, empfohlen)
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const user = await db.User.findByPk(req.user.id, {
+      attributes: ['id', 'username', 'email'], // Abrufen der relevanten Benutzerfelder
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    res.json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    });
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Profils:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
+  }
+});
+
 // Profil aktualisieren
 router.put('/profile', verifyToken, async (req, res) => {
   const { username, email } = req.body;
