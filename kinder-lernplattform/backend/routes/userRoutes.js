@@ -78,11 +78,11 @@ router.get('/dashboard', verifyToken, async (req, res) => {
   }
 });
 
-// Profil abrufen (Neu hinzugefügt)
+// Profil abrufen (angepasst)
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['username', 'email'], // Nur relevante Felder auswählen
+      attributes: ['id', 'username', 'email'], // Hier wird jetzt auch die ID mit zurückgegeben
     });
 
     if (!user) {
@@ -90,12 +90,13 @@ router.get('/profile', verifyToken, async (req, res) => {
     }
 
     res.json({
+      id: user.id, // Auch die ID wird jetzt zurückgegeben
       username: user.username,
       email: user.email,
     });
   } catch (error) {
     console.error('Fehler beim Abrufen des Profils:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
+    res.status(500).json({ message: 'Ein Fehler ist aufgetreten.' });
   }
 });
 
