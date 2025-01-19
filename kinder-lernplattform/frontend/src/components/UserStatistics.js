@@ -8,8 +8,8 @@ const UserStatistics = ({ userId, onClose }) => {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/users/${userId}/statistics`, {
+        const token = localStorage.getItem('authToken'); // Token-Key angepasst, um Konsistenz mit der Empfehlung zu wahren
+        const res = await fetch(`http://localhost:5000/users/user/${userId}/statistics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -41,17 +41,21 @@ const UserStatistics = ({ userId, onClose }) => {
         Schließen
       </button>
       <h2>Statistiken für {statistics.username}</h2>
-      <p><strong>Gesamtpunkte:</strong> {statistics.totalScores}</p>
-      <p><strong>Durchschnittliche Punkte:</strong> {statistics.averageScore}</p>
+      <p>
+        <strong>Gesamtpunkte:</strong> {statistics.totalScores}
+      </p>
+      <p>
+        <strong>Durchschnittliche Punkte:</strong>{' '}
+        {statistics.averageScore.toFixed(2)} {/* Durchschnittliche Punkte präzise formatieren */}
+      </p>
       <h3>Kategorien:</h3>
       <ul>
-        {Object.entries(statistics.categoryProgress).map(([category, score]) => (
-          <li key={category}>
-            <strong>{category}:</strong> {score}
+        {statistics.categoryProgress.map((category, index) => (
+          <li key={index}>
+            <strong>{category.category}:</strong> {category.totalScore} Punkte in {category.attempts} Versuchen
           </li>
         ))}
       </ul>
-      <p><strong>Versuche:</strong> {statistics.attempts}</p>
     </div>
   );
 };

@@ -88,7 +88,6 @@ router.get('/leaderboard', async (req, res) => {
   try {
     const whereCondition = category ? { category } : {}; // Kategorie filtern, falls angegeben
 
-    // Gesamte Rangliste abrufen (ohne Limit/Offset)
     const results = await db.Progress.findAll({
       attributes: [
         'userid',
@@ -101,12 +100,11 @@ router.get('/leaderboard', async (req, res) => {
           attributes: ['username'],
         },
       ],
-      where: whereCondition, // Kategoriebedingung
+      where: whereCondition,
       group: ['userid', 'user.id', 'user.username'],
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
     });
 
-    // Vergabe der Medaillen basierend auf der Gesamtliste
     const formattedResults = results.map((result, index) => ({
       rank: index + 1,
       username: result.user.username,
@@ -121,10 +119,7 @@ router.get('/leaderboard', async (req, res) => {
           : 'Teilnahme',
     }));
 
-    // Paginierung anwenden
     const paginatedResults = formattedResults.slice(offset, offset + parseInt(limit));
-
-    // Gesamtseitenanzahl berechnen
     const totalPages = Math.ceil(formattedResults.length / limit);
 
     res.json({
@@ -142,7 +137,7 @@ router.get('/leaderboard', async (req, res) => {
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'], // Abrufen der relevanten Benutzerfelder
+      attributes: ['id', 'username', 'email'],
     });
 
     if (!user) {
@@ -209,7 +204,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
   res.json(questions);
 });
 
-// Fortschritt speichern (POST /progress)
+// Fortschritt speichern
 router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
 
@@ -232,7 +227,7 @@ router.post('/progress', verifyToken, async (req, res) => {
   }
 });
 
-// Fortschritt abrufen (GET /progress)
+// Fortschritt abrufen
 router.get('/progress', verifyToken, async (req, res) => {
   try {
     const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
@@ -245,6 +240,31 @@ router.get('/progress', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Fehler beim Abrufen des Fortschritts:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Fortschritts!' });
+  }
+});
+
+// Benutzerstatistiken abrufen
+router.get('/user/:id/statistics', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const statistics = await db.Progress.findAll({
+      where: { userid: userId },
+      attributes: [
+        'category',
+        [db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'totalScore'],
+      ],
+      group: ['category'],
+    });
+
+    if (statistics.length === 0) {
+      return res.status(404).json({ message: 'Keine Statistiken für diesen Benutzer gefunden!' });
+    }
+
+    res.json(statistics);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Benutzerstatistiken:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerstatistiken!', error: error.message });
   }
 });
 

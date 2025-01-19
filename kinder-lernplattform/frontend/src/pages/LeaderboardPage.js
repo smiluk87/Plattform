@@ -4,11 +4,10 @@ import UserStatistics from '../components/UserStatistics';
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [category, setCategory] = useState('');
-  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null); // Neu: Zustand für ausgewählten Benutzer
 
   // Funktion zum Abrufen der Rangliste mit Paginierung
   const fetchLeaderboard = useCallback(async () => {
@@ -37,9 +36,13 @@ const LeaderboardPage = () => {
     fetchLeaderboard();
   }, [fetchLeaderboard]);
 
+  // Benutzerstatistiken öffnen
   const openUserStatistics = (userId) => setSelectedUser(userId);
+
+  // Benutzerstatistiken schließen
   const closeUserStatistics = () => setSelectedUser(null);
 
+  // Seiten-Navigation
   const handlePrevious = () => {
     if (page > 1) setPage((prev) => prev - 1);
   };
@@ -85,7 +88,6 @@ const LeaderboardPage = () => {
             leaderboard.map((user) => (
               <tr
                 key={user.rank}
-                onClick={() => openUserStatistics(user.userId)}
                 style={{
                   backgroundColor:
                     user.badge === 'Gold'
@@ -95,11 +97,18 @@ const LeaderboardPage = () => {
                       : user.badge === 'Bronze'
                       ? '#CD7F32'
                       : 'transparent',
-                  cursor: 'pointer',
                 }}
               >
                 <td>{user.rank}</td>
-                <td>{user.username}</td>
+                <td>
+                  {/* Benutzername anklickbar machen */}
+                  <span
+                    style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => openUserStatistics(user.userId)} // Benutzer-ID übergeben
+                  >
+                    {user.username}
+                  </span>
+                </td>
                 <td>{user.totalScore}</td>
                 <td>{user.badge}</td>
               </tr>
@@ -128,7 +137,9 @@ const LeaderboardPage = () => {
       </div>
 
       {/* Benutzerstatistiken anzeigen */}
-      {selectedUser && <UserStatistics userId={selectedUser} onClose={closeUserStatistics} />}
+      {selectedUser && (
+        <UserStatistics userId={selectedUser} onClose={closeUserStatistics} />
+      )}
     </div>
   );
 };
