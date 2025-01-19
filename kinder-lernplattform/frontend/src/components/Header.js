@@ -17,13 +17,15 @@ const Header = () => {
         <Link to="/test">Testseite</Link> |{' '}
         <Link to="/quiz">Quiz</Link> |{' '}
         <Link to="/profile">Profil</Link> |{' '}
-        <Link to="/progress">Fortschritt</Link> | {/* Neuer Link: Fortschritt */}
-        <Link to="/leaderboard">Rangliste</Link> | {/* Neuer Link: Rangliste */}
-
+        <Link to="/progress">Fortschritt</Link> |{' '}
+        <Link to="/leaderboard">Rangliste</Link> |{' '}
         {localStorage.getItem('token') && (
-          <button onClick={handleLogout} style={{ marginLeft: '10px' }}>
-            Logout
-          </button>
+          <>
+            <Link to="/dashboard">Dashboard</Link> |{' '} {/* Neuer Link zum Dashboard */}
+            <button onClick={handleLogout} style={{ marginLeft: '10px' }}>
+              Logout
+            </button>
+          </>
         )}
       </nav>
     </header>
