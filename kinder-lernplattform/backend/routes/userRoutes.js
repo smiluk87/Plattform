@@ -11,10 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    // Passwort hashen
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 ist der Salt-Wert
-
-    // Benutzer erstellen
+    const hashedPassword = await bcrypt.hash(password, 10); // Passwort hashen
     const user = await db.User.create({ username, email, password: hashedPassword });
     res.status(201).json({ message: 'Benutzer erfolgreich erstellt!', user });
   } catch (error) {
@@ -31,10 +28,7 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Passwort hashen
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 ist der Salt-Wert
-
-    // Benutzer erstellen
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await db.User.create({ username, email, password: hashedPassword });
     res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
   } catch (error) {
@@ -52,22 +46,18 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    // Benutzer anhand der E-Mail suchen
     const user = await db.User.findOne({ where: { email } });
 
     if (!user) {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
-    // Passwort vergleichen
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
-    // Token erstellen
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
-
     res.json({ token, message: 'Erfolgreich angemeldet!' });
   } catch (error) {
     console.error('Fehler beim Login:', error);
@@ -79,18 +69,14 @@ router.post('/login', async (req, res) => {
 router.get('/dashboard', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'], // Relevante Felder abrufen
+      attributes: ['id', 'username', 'email'],
     });
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    });
+    res.json({ id: user.id, username: user.username, email: user.email });
   } catch (error) {
     console.error('Fehler beim Abrufen der Benutzerdaten:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerdaten!' });
@@ -101,25 +87,21 @@ router.get('/dashboard', verifyToken, async (req, res) => {
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'], // Relevante Felder abrufen
+      attributes: ['id', 'username', 'email'],
     });
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    });
+    res.json({ id: user.id, username: user.username, email: user.email });
   } catch (error) {
     console.error('Fehler beim Abrufen des Profils:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
   }
 });
 
-// Profil aktualisieren (NEU hinzugefügt)
+// Profil aktualisieren
 router.put('/profile', verifyToken, async (req, res) => {
   const { username, email } = req.body;
 
@@ -130,18 +112,13 @@ router.put('/profile', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    // Benutzer aktualisieren
     user.username = username || user.username;
     user.email = email || user.email;
     await user.save();
 
     res.json({
       message: 'Profil erfolgreich aktualisiert!',
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-      },
+      user: { id: user.id, username: user.username, email: user.email },
     });
   } catch (error) {
     console.error('Fehler beim Aktualisieren des Profils:', error);
@@ -165,9 +142,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
   };
 
   const questions = quizData[subject];
-
   if (!questions) {
-    console.error(`Keine Fragen für das Thema "${subject}" gefunden.`);
     return res.status(404).json({ message: 'Thema nicht gefunden!' });
   }
 
@@ -177,6 +152,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
 // Fortschritt speichern
 router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
+
   if (!category || score === undefined) {
     return res.status(400).json({ message: 'Kategorie und Score sind erforderlich!' });
   }
@@ -213,7 +189,7 @@ router.get('/progress', verifyToken, async (req, res) => {
 });
 
 // Rangliste abrufen
-router.get('/leaderboard', verifyToken, async (req, res) => {
+router.get('/leaderboard', async (req, res) => {
   try {
     const results = await db.Progress.findAll({
       attributes: [
@@ -223,17 +199,26 @@ router.get('/leaderboard', verifyToken, async (req, res) => {
       include: [
         {
           model: db.User,
-          attributes: ['username'],
+          attributes: ['username'], // Nur den Benutzernamen abrufen
         },
       ],
-      group: ['userid', 'User.id', 'User.username'],
-      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
+      group: ['userid', 'User.id', 'User.username'], // Gruppieren nach Benutzer-ID und Benutzernamen
+      order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']], // Sortieren nach Gesamtpunkten absteigend
     });
 
-    const formattedResults = results.map((result) => ({
-      userId: result.userid,
-      username: result.User.username,
-      totalScore: result.dataValues.totalScore,
+    // Formatieren der Ergebnisse
+    const formattedResults = results.map((result, index) => ({
+      rank: index + 1, // Rang des Benutzers basierend auf der Sortierung
+      username: result.User.username, // Benutzername aus der User-Tabelle
+      totalScore: result.dataValues.totalScore, // Gesamtpunkte
+      badge:
+        index === 0
+          ? 'Gold'
+          : index === 1
+          ? 'Silber'
+          : index === 2
+          ? 'Bronze'
+          : 'Teilnahme', // Belohnungen basierend auf dem Rang
     }));
 
     res.json({ leaderboard: formattedResults });

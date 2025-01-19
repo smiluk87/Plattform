@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import UserStatistics from '../components/UserStatistics';
-import axios from 'axios';
 
 const LeaderboardPage = () => {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -14,23 +13,21 @@ const LeaderboardPage = () => {
   const fetchLeaderboard = useCallback(async () => {
     const token = localStorage.getItem('authToken');
     try {
-      const res = await fetch('http://localhost:5000/leaderboard', {
+      const res = await fetch(`http://localhost:5000/users/leaderboard?page=${page}&category=${category}&search=${search}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       if (!res.ok) {
         throw new Error('Fehler beim Abrufen der Rangliste.');
       }
-  
+
       const data = await res.json();
       setLeaderboard(data.leaderboard || []);
+      setTotalPages(data.totalPages || 1); // Backend sollte `totalPages` liefern
     } catch (err) {
       setError(err.message);
     }
-  }, []);
-  
-  
-  
+  }, [page, category, search]);
 
   useEffect(() => {
     fetchLeaderboard();

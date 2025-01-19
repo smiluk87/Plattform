@@ -1,7 +1,6 @@
 require('dotenv').config(); // Umgebungsvariablen laden
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const app = express();
 
 // Routen importieren
@@ -10,8 +9,7 @@ const authRoutes = require('./routes/authRoutes'); // Authentifizierungs-Routen
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(express.json());
+app.use(express.json()); // Express integriert bodyParser.json()
 
 // Beispiel-Route (Root-Endpoint)
 app.get('/', (req, res) => {
@@ -22,7 +20,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes); // Alle Routen sind unter '/auth/*' erreichbar, z. B. '/auth/login'
 
 // Benutzer-, Fortschritts- und Quizrouten registrieren
-app.use('/users', userRoutes); // Alle Routen sind jetzt unter '/users/*' erreichbar (anstatt '/api/users')
+app.use('/users', userRoutes); // Alle Routen sind jetzt unter '/users/*' erreichbar
 
 // Fehlerbehandlung für nicht gefundene Routen
 app.use((req, res, next) => {
