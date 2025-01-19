@@ -7,6 +7,7 @@ const app = express();
 // Routen importieren
 const userRoutes = require('./routes/userRoutes'); // Benutzer-, Dashboard-, Fortschritt- und Quiz-Routen
 const authRoutes = require('./routes/authRoutes'); // Authentifizierungs-Routen
+const progressRoutes = require('./routes/progressRoutes'); // Fortschritt-Routen (neu hinzugefügt)
 
 // Middleware
 app.use(cors());
@@ -23,6 +24,9 @@ app.use('/auth', authRoutes); // Alle Routen sind unter '/auth/*' erreichbar, z.
 
 // Benutzer-, Fortschritts- und Quizrouten registrieren
 app.use('/api/users', userRoutes); // Alle Routen sind unter '/api/users/*' erreichbar
+
+// Fortschritt-Routen registrieren
+app.use('/api/progress', progressRoutes); // Alle Routen sind unter '/api/progress/*' erreichbar
 
 // Fehlerbehandlung für nicht gefundene Routen
 app.use((req, res, next) => {
@@ -44,4 +48,5 @@ app.listen(PORT, () => {
   console.log(`  - POST   /auth/login  (Login-Route)`);
   console.log(`  - Weitere Auth-Routen sind unter /auth verfügbar`);
   console.log(`  - Benutzer- und Quiz-Routen sind unter /api/users verfügbar`);
+  console.log(`  - Fortschritt-Routen sind unter /api/progress verfügbar`); // Zeigt die Fortschritt-Routen an
 });
