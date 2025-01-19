@@ -24,7 +24,7 @@ const DashboardPage = () => {
 
       try {
         // Benutzername abrufen
-        const userRes = await fetch('http://localhost:5000/api/users/dashboard', {
+        const userRes = await fetch('http://localhost:5000/users/dashboard', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -36,7 +36,7 @@ const DashboardPage = () => {
         setUsername(userData.username); // Benutzername setzen
 
         // Fortschrittsdaten abrufen
-        const progressRes = await fetch('http://localhost:5000/api/users/progress', {
+        const progressRes = await fetch('http://localhost:5000/users/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
