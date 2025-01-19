@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchProfile } from '../services/api'; // Importiere die fetchProfile-Funktion
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({ username: '', email: '' });
@@ -8,7 +9,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       const token = localStorage.getItem('authToken'); // Token aus dem LocalStorage abrufen
       if (!token) {
         setError('Authentifizierung fehlgeschlagen. Bitte melden Sie sich an.');
@@ -17,18 +18,7 @@ const ProfilePage = () => {
 
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:5000/users/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) {
-          if (res.status === 401) {
-            throw new Error('Nicht autorisiert. Bitte melden Sie sich erneut an.');
-          }
-          throw new Error('Fehler beim Abrufen des Profils.');
-        }
-
-        const data = await res.json();
+        const data = await fetchProfile(token); // Verwendung der fetchProfile-Funktion
         setUserData({ username: data.username, email: data.email });
         setError('');
       } catch (err) {
@@ -38,7 +28,7 @@ const ProfilePage = () => {
       }
     };
 
-    fetchProfile();
+    fetchProfileData();
   }, []);
 
   const handleSave = async () => {

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000"; // Überprüfe, ob /api erforderlich ist
 
 // Benutzerprofil abrufen
 export const getUserProfile = async (token) => {
@@ -63,4 +63,20 @@ export const getQuizQuestions = async (category, token) => {
   });
   if (!response.ok) throw new Error("Fehler beim Abrufen der Quizfragen.");
   return response.json();
+};
+
+// Die vorgeschlagene Funktion `fetchProfile` als Alternative (identisch mit getUserProfile)
+export const fetchProfile = async (token) => {
+  const response = await fetch(`${API_URL}/users/profile`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Fehler beim Abrufen des Profils: ${response.statusText}`);
+  }
+
+  return await response.json();
 };
