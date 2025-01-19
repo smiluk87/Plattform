@@ -88,6 +88,7 @@ router.get('/leaderboard', async (req, res) => {
   try {
     const whereCondition = category ? { category } : {}; // Kategorie filtern, falls angegeben
 
+    // Gesamte Rangliste abrufen (ohne Limit/Offset)
     const results = await db.Progress.findAll({
       attributes: [
         'userid',
@@ -103,18 +104,11 @@ router.get('/leaderboard', async (req, res) => {
       where: whereCondition, // Kategoriebedingung
       group: ['userid', 'user.id', 'user.username'],
       order: [[db.Sequelize.fn('SUM', db.Sequelize.col('score')), 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
     });
 
-    const totalResults = await db.Progress.count({
-      where: whereCondition,
-      distinct: true,
-      col: 'userid',
-    });
-
+    // Vergabe der Medaillen basierend auf der Gesamtliste
     const formattedResults = results.map((result, index) => ({
-      rank: index + 1 + offset,
+      rank: index + 1,
       username: result.user.username,
       totalScore: result.dataValues.totalScore,
       badge:
@@ -127,9 +121,15 @@ router.get('/leaderboard', async (req, res) => {
           : 'Teilnahme',
     }));
 
+    // Paginierung anwenden
+    const paginatedResults = formattedResults.slice(offset, offset + parseInt(limit));
+
+    // Gesamtseitenanzahl berechnen
+    const totalPages = Math.ceil(formattedResults.length / limit);
+
     res.json({
-      leaderboard: formattedResults,
-      totalPages: Math.ceil(totalResults / limit),
+      leaderboard: paginatedResults,
+      totalPages,
       currentPage: parseInt(page),
     });
   } catch (error) {
