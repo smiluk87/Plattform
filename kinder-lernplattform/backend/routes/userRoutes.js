@@ -78,6 +78,24 @@ router.get('/dashboard', verifyToken, async (req, res) => {
   }
 });
 
+// Profil abrufen (Neu hinzugefügt)
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const user = await db.User.findByPk(req.user.id, {
+      attributes: ['id', 'username', 'email'], // Nur relevante Felder auswählen
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Profils:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
+  }
+});
+
 // Quizfragen abrufen
 router.get('/quiz/:subject', verifyToken, (req, res) => {
   const subject = req.params.subject;
