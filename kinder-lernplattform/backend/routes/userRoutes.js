@@ -59,22 +59,22 @@ router.post('/login', async (req, res) => {
 // Dashboard
 router.get('/dashboard', verifyToken, async (req, res) => {
   try {
-    if (!req.user?.id) {
-      return res.status(401).json({ message: 'Ungültiges Token oder Benutzer-ID fehlt!' });
-    }
+    const user = await db.User.findByPk(req.user.id, {
+      attributes: ['id', 'username', 'email'], // Relevante Felder abrufen
+    });
 
-    const user = await db.User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
     res.json({
+      id: user.id,
       username: user.username,
       email: user.email,
     });
   } catch (error) {
-    console.error('Fehler beim Abrufen des Dashboards:', error);
-    res.status(500).json({ message: 'Fehler beim Abrufen des Dashboards!' });
+    console.error('Fehler beim Abrufen der Benutzerdaten:', error);
+    res.status(500).json({ message: 'Fehler beim Abrufen der Benutzerdaten!' });
   }
 });
 
@@ -82,7 +82,7 @@ router.get('/dashboard', verifyToken, async (req, res) => {
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'], // Hier wird jetzt auch die ID mit zurückgegeben
+      attributes: ['id', 'username', 'email'], // Relevante Felder abrufen
     });
 
     if (!user) {
@@ -96,7 +96,7 @@ router.get('/profile', verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Fehler beim Abrufen des Profils:', error);
-    res.status(500).json({ message: 'Ein Fehler ist aufgetreten.' });
+    res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
   }
 });
 
