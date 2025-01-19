@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); // bcrypt für Passwort-Hashing und -Vergleich
 const { verifyToken } = require('../middlewares/authMiddleware');
 const db = require('../models');
 
@@ -10,7 +11,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 router.post('/users', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const user = await db.User.create({ username, email, password });
+    // Passwort hashen
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 ist der Salt-Wert
+
+    // Benutzer erstellen
+    const user = await db.User.create({ username, email, password: hashedPassword });
     res.status(201).json({ message: 'Benutzer erfolgreich erstellt!', user });
   } catch (error) {
     res.status(500).json({ message: 'Fehler beim Erstellen des Benutzers!', error: error.message });
@@ -26,9 +31,14 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    const user = await db.User.create({ username, email, password });
+    // Passwort hashen
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 ist der Salt-Wert
+
+    // Benutzer erstellen
+    const user = await db.User.create({ username, email, password: hashedPassword });
     res.status(201).json({ message: 'Benutzer erfolgreich registriert!', user });
   } catch (error) {
+    console.error('Fehler bei der Registrierung:', error);
     res.status(500).json({ message: 'Fehler bei der Registrierung!', error: error.message });
   }
 });
@@ -42,16 +52,25 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    // Benutzer anhand der E-Mail suchen
     const user = await db.User.findOne({ where: { email } });
 
-    if (!user || user.password !== password) {
+    if (!user) {
       return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
     }
 
+    // Passwort vergleichen
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Ungültige Zugangsdaten!' });
+    }
+
+    // Token erstellen
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ token, message: 'Erfolgreich angemeldet!' });
   } catch (error) {
+    console.error('Fehler beim Login:', error);
     res.status(500).json({ message: 'Fehler beim Login!', error: error.message });
   }
 });
