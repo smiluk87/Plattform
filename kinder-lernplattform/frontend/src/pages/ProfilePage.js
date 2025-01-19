@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProfile } from '../services/api'; // Importiere die fetchProfile-Funktion
+import { fetchProfile } from '../util/api'; // Importiere die fetchProfile-Funktion
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({ username: '', email: '' });

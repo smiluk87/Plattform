@@ -82,14 +82,17 @@ router.get('/dashboard', verifyToken, async (req, res) => {
 router.get('/profile', verifyToken, async (req, res) => {
   try {
     const user = await db.User.findByPk(req.user.id, {
-      attributes: ['id', 'username', 'email'], // Nur relevante Felder auswählen
+      attributes: ['username', 'email'], // Nur relevante Felder auswählen
     });
 
     if (!user) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden!' });
     }
 
-    res.json(user);
+    res.json({
+      username: user.username,
+      email: user.email,
+    });
   } catch (error) {
     console.error('Fehler beim Abrufen des Profils:', error);
     res.status(500).json({ message: 'Fehler beim Abrufen des Profils!' });
