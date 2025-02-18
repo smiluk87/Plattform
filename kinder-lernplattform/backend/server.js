@@ -24,10 +24,17 @@ app.use('/users', userRoutes); // Alle Routen sind jetzt unter '/users/*' erreic
 console.log("✅ userRoutes wurden unter /users eingebunden!"); // Debugging-Zeile
 
 // Debugging: Registrierte Routen anzeigen
-app._router.stack.forEach((r) => {
-  if (r.route && r.route.path) {
-    console.log(`Registered Route: ${r.route.path}`);
-  }
+console.log("📌 Registrierte Routen:");
+app._router.stack.forEach((middleware) => {
+    if (middleware.route) { // Routen, die direkt definiert wurden
+        console.log(`➡️  ${middleware.route.path}`);
+    } else if (middleware.name === 'router') { // Routen, die über Router() definiert wurden
+        middleware.handle.stack.forEach((handler) => {
+            if (handler.route) {
+                console.log(`➡️  ${handler.route.path}`);
+            }
+        });
+    }
 });
 
 // Fehlerbehandlung für nicht gefundene Routen
