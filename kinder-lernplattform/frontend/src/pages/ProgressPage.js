@@ -22,7 +22,7 @@ const ProgressPage = () => {
     const fetchProgress = async () => {
       const token = localStorage.getItem('authToken');
       try {
-        const res = await fetch('http://localhost:5000/progress', {
+        const res = await fetch('http://localhost:5000/users/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
     
