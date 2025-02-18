@@ -208,7 +208,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
 });
 
 // Fortschritt speichern
-router.post('/users/progress', verifyToken, async (req, res) => {
+router.post('/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
 
   if (!category || score === undefined) {
@@ -231,7 +231,7 @@ router.post('/users/progress', verifyToken, async (req, res) => {
 });
 
 // Fortschritt abrufen
-router.get('/users/progress', verifyToken, async (req, res) => {
+router.get('/progress', verifyToken, async (req, res) => {
   try {
     const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
 

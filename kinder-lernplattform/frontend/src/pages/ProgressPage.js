@@ -21,16 +21,21 @@ const ProgressPage = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       const token = localStorage.getItem('authToken');
+      console.log("Abruf des Fortschritts mit Token:", token); // Debugging
       try {
         const res = await fetch('http://localhost:5000/users/progress', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("Status Code:", res.status); // Debugging
     
         if (!res.ok) {
+          const errorData = await res.json();
+          console.error("Fehler beim Abrufen der Fortschrittsdaten:", errorData);
           throw new Error('Fehler beim Abrufen der Fortschrittsdaten.');
         }
     
         const data = await res.json();
+        console.log("Erhaltene Fortschrittsdaten:", data); // Debugging
         setProgressData(data.progresses || []);
         setStatistics(data.statistics || {});
       } catch (err) {
