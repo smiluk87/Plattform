@@ -16,30 +16,52 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const ProgressPage = () => {
   const [progressData, setProgressData] = useState([]); // Fortschrittsdaten
   const [statistics, setStatistics] = useState({}); // Statistiken
+  const [loading, setLoading] = useState(true); // Ladezustand
   const [error, setError] = useState(''); // Fehlernachricht
 
   useEffect(() => {
     const fetchProgress = async () => {
       const token = localStorage.getItem('authToken');
-      console.log("Abruf des Fortschritts mit Token:", token); // Debugging
+      console.log("📡 Abruf des Fortschritts mit Token:", token);
+
+      if (!token) {
+        setError("Kein Authentifizierungs-Token gefunden.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch('http://localhost:5000/users/progress', {
+        const res = await fetch(`http://localhost:5000/users/progress`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Status Code:", res.status); // Debugging
-    
+
+        console.log("🔎 Status Code:", res.status);
+
         if (!res.ok) {
           const errorData = await res.json();
-          console.error("Fehler beim Abrufen der Fortschrittsdaten:", errorData);
-          throw new Error('Fehler beim Abrufen der Fortschrittsdaten.');
+          console.error("❌ Fehler beim Abrufen der Fortschrittsdaten:", errorData);
+          throw new Error(errorData.message || 'Fehler beim Abrufen der Fortschrittsdaten.');
         }
-    
+
         const data = await res.json();
-        console.log("Erhaltene Fortschrittsdaten:", data); // Debugging
-        setProgressData(data.progresses || []);
-        setStatistics(data.statistics || {});
+        console.log("✅ Erhaltene Fortschrittsdaten:", data);
+
+        if (Array.isArray(data) && data.length > 0) {
+          setProgressData(data);
+          setStatistics({
+            averageScore: (data.reduce((acc, entry) => acc + entry.score, 0) / data.length).toFixed(2),
+            highestScore: Math.max(...data.map(entry => entry.score)),
+            attempts: data.length,
+          });
+        } else {
+          console.warn("⚠️ Keine Fortschrittsdaten vorhanden.");
+          setProgressData([]);
+          setStatistics({});
+        }
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -67,15 +89,23 @@ const ProgressPage = () => {
   return (
     <div>
       <h1>Fortschritt</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div>
-        <h3>Statistiken:</h3>
-        <p><strong>Durchschnittlicher Score:</strong> {statistics.averageScore || 'N/A'}</p>
-        <p><strong>Höchster Score:</strong> {statistics.highestScore || 'N/A'}</p>
-        <p><strong>Anzahl der Versuche:</strong> {statistics.attempts || 'N/A'}</p>
-      </div>
-      {progressData.length > 0 ? (
+
+      {error && <p style={{ color: 'red' }}>❌ {error}</p>}
+      {loading && <p>⏳ Lade Fortschrittsdaten...</p>}
+
+      {!loading && !error && progressData.length === 0 && (
+        <p>⚠️ Keine Fortschrittsdaten vorhanden.</p>
+      )}
+
+      {!loading && progressData.length > 0 && (
         <>
+          <div>
+            <h3>📊 Statistiken:</h3>
+            <p><strong>Durchschnittlicher Score:</strong> {statistics.averageScore || 'N/A'}</p>
+            <p><strong>Höchster Score:</strong> {statistics.highestScore || 'N/A'}</p>
+            <p><strong>Anzahl der Versuche:</strong> {statistics.attempts || 'N/A'}</p>
+          </div>
+
           <Bar
             data={chartData}
             options={{
@@ -91,6 +121,7 @@ const ProgressPage = () => {
               },
             }}
           />
+
           <table>
             <thead>
               <tr>
@@ -110,8 +141,6 @@ const ProgressPage = () => {
             </tbody>
           </table>
         </>
-      ) : (
-        <p>Keine Fortschrittsdaten vorhanden.</p>
       )}
     </div>
   );

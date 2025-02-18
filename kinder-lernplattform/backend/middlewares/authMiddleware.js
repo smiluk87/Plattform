@@ -3,9 +3,11 @@ const db = require('../models'); // Import des Datenbankmodells
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
 const verifyToken = async (req, res, next) => {
+  console.log("🛠 Token-Prüfung gestartet...");
   const token = req.headers['authorization']?.split(' ')[1]; // Verwendung von optionalem Chaining
 
   if (!token) {
+    console.log("⛔ Kein Token gefunden!");
     return res.status(401).json({ message: 'Zugriff verweigert. Kein Token vorhanden.' }); // Konsistente Fehlermeldung
   }
 
@@ -13,7 +15,8 @@ const verifyToken = async (req, res, next) => {
     // Token validieren und Benutzerinformationen extrahieren
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded; // Benutzerinformationen aus dem Token speichern
-
+    console.log("✅ Token gültig, User:", decoded);
+    
     // Benutzer in der Datenbank überprüfen
     const user = await db.User.findByPk(decoded.id);
     if (!user) {

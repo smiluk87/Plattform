@@ -16,6 +16,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hb
 GET http://localhost:5000/users/progress
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNzEzMjE3NCwiZXhwIjoxNzM3MTM1Nzc0fQ._JJssQ7L6m-PKY8LnNvyceeWOc8QCdBkDpyoxsTy3Lo
 
+### Progresspage Testen
+GET http://localhost:5000/users/progress -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywidXNlcm5hbWUiOiJoYWRhMTIzNCIsImlhdCI6MTczOTkxNDA4MywiZXhwIjoxNzM5OTE3NjgzfQ.TThgL_OhEcGq2xjVDnDCVp5X8lTz7UX5VOkrz5SDM1M"
+
 
 
 ### Ranglisten überprüfen
