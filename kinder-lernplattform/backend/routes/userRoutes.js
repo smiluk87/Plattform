@@ -231,7 +231,7 @@ router.post('/progress', verifyToken, async (req, res) => {
 });
 
 // Fortschritt abrufen
-router.get('/progress', verifyToken, async (req, res) => {
+router.get('/users/progress', verifyToken, async (req, res) => {
   try {
     const progress = await db.Progress.findAll({ where: { userid: req.user.id } });
 
