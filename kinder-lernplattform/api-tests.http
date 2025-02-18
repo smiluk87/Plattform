@@ -1,10 +1,11 @@
 //GET /Progress: 
 GET http://localhost:5000/users/progress
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNzEzMjE3NCwiZXhwIjoxNzM3MTM1Nzc0fQ._JJssQ7L6m-PKY8LnNvyceeWOc8QCdBkDpyoxsTy3Lo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJiYWRhMTIzNCIsImlhdCI6MTczOTgzNDAyOSwiZXhwIjoxNzM5ODM3NjI5fQ.zXVSO8v-JdLiGQITi_pj2kAGG8_puDgGPm9IVYkXy6E
 
 ### Quizfragen Englisch testen 
 GET http://localhost:5000/users/quiz/english
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTczNzEzMjE3NCwiZXhwIjoxNzM3MTM1Nzc0fQ._JJssQ7L6m-PKY8LnNvyceeWOc8QCdBkDpyoxsTy3Lo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJiYWRhMTIzNCIsImlhdCI6MTczOTgzNDAyOSwiZXhwIjoxNzM5ODM3NjI5fQ.zXVSO8v-JdLiGQITi_pj2kAGG8_puDgGPm9IVYkXy6E
+
 
 ### Quizfragen math testen 
 GET http://localhost:5000/users/quiz/math
