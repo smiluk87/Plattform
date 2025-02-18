@@ -17,11 +17,19 @@ app.get('/', (req, res) => {
 });
 
 // Authentifizierungsrouten registrieren (Login, Registrierung usw.)
-//app.use('/api', userRoutes); // Alle Routen sind unter '/api/*' erreichbar
+// app.use('/api', userRoutes); // Alle Routen sind unter '/api/*' erreichbar
 app.use('/auth', authRoutes); // Alle Routen sind unter '/auth/*' erreichbar, z. B. '/auth/login'
 
 // Benutzer-, Fortschritts- und Quizrouten registrieren
 app.use('/users', userRoutes); // Alle Routen sind jetzt unter '/users/*' erreichbar
+
+// Debugging: Registrierte Routen ausgeben
+console.log("Registrierte Routen:");
+app._router.stack.forEach((r) => {
+  if (r.route && r.route.path) {
+    console.log(`Registered Route: ${r.route.path}`);
+  }
+});
 
 // Fehlerbehandlung für nicht gefundene Routen
 app.use((req, res, next) => {
