@@ -208,7 +208,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
 });
 
 // Fortschritt speichern
-router.post('/progress', verifyToken, async (req, res) => {
+router.post('/users/progress', verifyToken, async (req, res) => {
   const { category, score } = req.body;
 
   if (!category || score === undefined) {
