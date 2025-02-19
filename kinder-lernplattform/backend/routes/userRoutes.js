@@ -190,9 +190,9 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
       { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
       { question: 'Was ist die Wurzel aus 49?', options: ['6', '7', '8'], answer: '7' },
       { question: 'Was ist 8 * 5?', options: ['20', '24', '40'], answer: '40' },
-      { question: 'Wie viele Ecken hat ein Würfel?', options: ['6', '8', '12'], answer: '8' },
+      { question: 'Wie viele Ecken hat ein Würfel\?', options: ['6', '8', '12'], answer: '8' },
       { question: 'Was ist 88 / 11?', options: ['6', '8', '9'], answer: '8' },
-      { question: 'Wie viele Sekunden sind in einer Stunde?', options: ['360', '3600', '6000'], answer: '3600' },
+      { question: 'Wie viele Sekunden sind in einer Stunde\?', options: ['360', '3600', '6000'], answer: '3600' },
       { question: 'Was ist 2³?', options: ['6', '8', '10'], answer: '8' },
       { question: 'Was ist der Flächeninhalt eines Rechtecks mit Länge 10m und Breite 5m?', options: ['40m²', '50m²', '60m²'], answer: '50m²' },
       { question: 'Was ist der Umfang eines Kreises mit Radius 7 (π ≈ 3,14)?', options: ['43,96', '44,00', '45,02'], answer: '43,96' },
@@ -210,7 +210,7 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
       { question: "Which word is a synonym for 'beautiful'?", options: ['ugly', 'gorgeous', 'plain'], answer: 'gorgeous' },
       { question: "Which sentence expresses a planned future action?", options: ["I will visit my grandmother tomorrow.", "I visited my grandmother yesterday.", "I have visited my grandmother."], answer: "I will visit my grandmother tomorrow." },
     ],
-    
+
   };
 
   const questions = quizData[subject];
