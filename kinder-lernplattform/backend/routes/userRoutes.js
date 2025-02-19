@@ -188,14 +188,29 @@ router.get('/quiz/:subject', verifyToken, (req, res) => {
     math: [
       { question: 'Was ist 2 + 2?', options: ['3', '4', '5'], answer: '4' },
       { question: 'Was ist 10 - 5?', options: ['3', '4', '5'], answer: '5' },
+      { question: 'Was ist die Wurzel aus 49?', options: ['6', '7', '8'], answer: '7' },
       { question: 'Was ist 8 * 5?', options: ['20', '24', '40'], answer: '40' },
+      { question: 'Wie viele Ecken hat ein Würfel?', options: ['6', '8', '12'], answer: '8' },
       { question: 'Was ist 88 / 11?', options: ['6', '8', '9'], answer: '8' },
+      { question: 'Wie viele Sekunden sind in einer Stunde?', options: ['360', '3600', '6000'], answer: '3600' },
+      { question: 'Was ist 2³?', options: ['6', '8', '10'], answer: '8' },
+      { question: 'Was ist der Flächeninhalt eines Rechtecks mit Länge 10m und Breite 5m?', options: ['40m²', '50m²', '60m²'], answer: '50m²' },
+      { question: 'Was ist der Umfang eines Kreises mit Radius 7 (π ≈ 3,14)?', options: ['43,96', '44,00', '45,02'], answer: '43,96' },
     ],
+
     english: [
       { question: "What is the opposite of 'hot'?", options: ['cold', 'warm', 'cool'], answer: 'cold' },
       { question: "What is the opposite of 'happy'?", options: ['outraged', 'sad', 'overwhelmed'], answer: 'sad' },
       { question: "How many days are in a 'week'?", options: ['five', 'seven', 'ten'], answer: 'seven' },
+      { question: "What is the plural of 'child'?", options: ['childs', 'children', 'childes'], answer: 'children' },
+      { question: "Which sentence is correct?", options: ['She don\’t like pizza.', 'She doesn\’t like pizza.', 'She didn\’t likes pizza.'], answer: 'She doesn\’t like pizza.' },
+      { question: "Which word is a noun?", options: ['run', 'apple', 'quickly'], answer: 'apple' },
+      { question: "What is the correct spelling?", options: ['beleive', 'believe', 'belive'], answer: 'believe' },
+      { question: "What is the past tense of 'go'?", options: ['goed', 'went', 'gone'], answer: 'went' },
+      { question: "Which word is a synonym for 'beautiful'?", options: ['ugly', 'gorgeous', 'plain'], answer: 'gorgeous' },
+      { question: "Which sentence expresses a planned future action?", options: ["I will visit my grandmother tomorrow.", "I visited my grandmother yesterday.", "I have visited my grandmother."], answer: "I will visit my grandmother tomorrow." },
     ],
+    
   };
 
   const questions = quizData[subject];
