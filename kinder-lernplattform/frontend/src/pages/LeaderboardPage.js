@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import UserStatistics from '../components/UserStatistics';
 
@@ -145,3 +146,4 @@ const LeaderboardPage = () => {
 };
 
 export default LeaderboardPage;
+

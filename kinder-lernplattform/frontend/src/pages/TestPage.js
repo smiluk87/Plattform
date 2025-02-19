@@ -12,8 +12,8 @@ const TestPage = () => {
           'Content-Type': 'application/json', // Header für JSON-Daten
         },
         body: JSON.stringify({
-          email: 'tada1234@gmail.com', // Testwerte (später ersetzen)
-          password: 'password123', // Testwerte (später ersetzen)
+          email: 'tada12345@gmail.com', // Testwerte (später ersetzen)
+          password: 'password12345', // Testwerte (später ersetzen)
         }),
       });
       if (res.ok) {
